@@ -1,7 +1,10 @@
 #pragma warning disable ASPIREINTERACTION001 // Interaction Service is for evaluation purposes only
 
+using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 using Projects;
+using System.Collections.Generic;
+using System.IO;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -54,6 +57,171 @@ builder.Eventing.Subscribe<AfterResourcesCreatedEvent>(async (@event, cancellati
             Intent = MessageIntent.Information,
             ShowSecondaryButton = false,
         });
+});
+
+// Subscribe to console app resource ready event to capture and display output after completion
+consoleAppBuilder.OnResourceReady(async (resource, readyEvent, cancellationToken) =>
+{
+    var interactionService = readyEvent.Services.GetRequiredService<IInteractionService>();
+    
+    if (!interactionService.IsAvailable)
+    {
+        return;
+    }
+    
+    // The console app writes output to console_output.txt in its base directory (AppContext.BaseDirectory)
+    // In Aspire, project resources run in their build output directory
+    // We need to construct the path to the console app's output file
+    
+    // Construct the path based on the known project structure
+    // The console app is in the ConsoleRunner directory relative to the solution root
+    var appHostAssemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+    var appHostDir = Path.GetDirectoryName(appHostAssemblyLocation) ?? AppContext.BaseDirectory;
+    
+    // Navigate from AppHost/bin/Debug/net10.0 to solution root, then to ConsoleRunner/bin/Debug/net10.0
+    var solutionRoot = Path.GetFullPath(Path.Combine(appHostDir, "..", "..", "..", ".."));
+    
+    // Try Debug first, then Release
+    var debugPath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.txt");
+    var releasePath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Release", "net10.0", "console_output.txt");
+    
+    // Also try relative to AppHost directory (in case paths are different)
+    var relativeDebugPath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.txt");
+    var relativeReleasePath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Release", "net10.0", "console_output.txt");
+    
+    // Find the first existing file, or use Debug as default
+    var outputFilePath = File.Exists(debugPath) ? debugPath :
+                        File.Exists(releasePath) ? releasePath :
+                        File.Exists(relativeDebugPath) ? Path.GetFullPath(relativeDebugPath) :
+                        File.Exists(relativeReleasePath) ? Path.GetFullPath(relativeReleasePath) :
+                        debugPath; // Default to Debug path for file watcher
+    
+    // Use FileSystemWatcher to monitor the output file
+    var watchDirectory = Path.GetDirectoryName(outputFilePath);
+    if (string.IsNullOrEmpty(watchDirectory) || !Directory.Exists(watchDirectory))
+    {
+        // If directory doesn't exist, wait a bit and check again
+        await Task.Delay(1000, cancellationToken);
+        watchDirectory = Path.GetDirectoryName(outputFilePath);
+    }
+    
+    FileSystemWatcher? fileWatcher = null;
+    if (!string.IsNullOrEmpty(watchDirectory) && Directory.Exists(watchDirectory))
+    {
+        fileWatcher = new FileSystemWatcher
+        {
+            Path = watchDirectory,
+            Filter = Path.GetFileName(outputFilePath),
+            NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName,
+            EnableRaisingEvents = true
+        };
+    }
+    
+    var fileUpdated = new TaskCompletionSource<bool>();
+    var fileRead = false;
+    
+    // Watch for file changes if watcher was created
+    if (fileWatcher != null)
+    {
+        fileWatcher.Changed += (_, e) =>
+        {
+            if (!fileRead && File.Exists(e.FullPath))
+            {
+                // Small delay to ensure file write is complete
+                Task.Delay(100).ContinueWith(_ =>
+                {
+                    if (!fileRead)
+                    {
+                        fileRead = true;
+                        fileUpdated.TrySetResult(true);
+                    }
+                });
+            }
+        };
+        
+        fileWatcher.Created += (_, _) =>
+        {
+            if (!fileRead)
+            {
+                fileRead = true;
+                fileUpdated.TrySetResult(true);
+            }
+        };
+    }
+    
+    // Also check if file already exists (console app might have completed quickly)
+    if (File.Exists(outputFilePath))
+    {
+        await Task.Delay(500, cancellationToken); // Wait a bit for file to be fully written
+        if (!fileRead)
+        {
+            fileRead = true;
+            fileUpdated.TrySetResult(true);
+        }
+    }
+    
+    // Wait for file update or timeout after 10 seconds
+    var timeoutTask = Task.Delay(10000, cancellationToken);
+    await Task.WhenAny(fileUpdated.Task, timeoutTask);
+    
+    if (fileWatcher != null)
+    {
+        fileWatcher.EnableRaisingEvents = false;
+        fileWatcher.Dispose();
+    }
+    
+    // Read the file contents
+    string? outputText = null;
+    try
+    {
+        if (File.Exists(outputFilePath))
+        {
+            // Retry reading in case file is still being written
+            for (int i = 0; i < 5; i++)
+            {
+                try
+                {
+                    outputText = await File.ReadAllTextAsync(outputFilePath, cancellationToken);
+                    break;
+                }
+                catch (IOException)
+                {
+                    // File might still be locked, wait and retry
+                    await Task.Delay(200, cancellationToken);
+                }
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        // Log error but continue
+        outputText = $"Error reading output file: {ex.Message}";
+    }
+    
+    // Display the captured console output via notification
+    if (!string.IsNullOrWhiteSpace(outputText))
+    {
+        await interactionService.PromptNotificationAsync(
+            title: "Console App Output",
+            message: outputText.Trim(),
+            options: new NotificationInteractionOptions
+            {
+                Intent = MessageIntent.Success,
+                ShowSecondaryButton = false
+            });
+    }
+    else
+    {
+        // If no output captured, show a notification indicating completion but no output
+        await interactionService.PromptNotificationAsync(
+            title: "Console App Completed",
+            message: "The console app has completed execution, but no output was captured from the file.",
+            options: new NotificationInteractionOptions
+            {
+                Intent = MessageIntent.Information,
+                ShowSecondaryButton = false
+            });
+    }
 });
 
 builder.Build().Run();
