@@ -1,10 +1,9 @@
 #pragma warning disable ASPIREINTERACTION001 // Interaction Service is for evaluation purposes only
 
-using Aspire.Hosting.ApplicationModel;
 using Microsoft.Extensions.DependencyInjection;
 using Projects;
-using System.Collections.Generic;
-using System.IO;
+using System.Text.Json;
+using AIObservabilityAndEvaluationWorkshop.Definitions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -45,7 +44,7 @@ builder.Eventing.Subscribe<AfterResourcesCreatedEvent>(async (@event, cancellati
     var message = result.Data?.Value ?? "Hello, World!";
 
     // Ensure the console app has the OTLP endpoint for telemetry
-    consoleAppBuilder = consoleAppBuilder.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:19288");
+    //consoleAppBuilder = consoleAppBuilder.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:19288");
 
     // Configure the console app to run with the display command and message
     consoleAppBuilder.WithArgs("display", message);
@@ -82,13 +81,13 @@ consoleAppBuilder.OnResourceReady(async (resource, readyEvent, cancellationToken
     var solutionRoot = Path.GetFullPath(Path.Combine(appHostDir, "..", "..", "..", ".."));
     
     // Try Debug first, then Release
-    var debugPath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.txt");
-    var releasePath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Release", "net10.0", "console_output.txt");
+    var debugPath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.json");
+    var releasePath = Path.Combine(solutionRoot, "ConsoleRunner", "bin", "Release", "net10.0", "console_output.json");
     
     // Also try relative to AppHost directory (in case paths are different)
-    var relativeDebugPath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.txt");
-    var relativeReleasePath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Release", "net10.0", "console_output.txt");
-    
+    var relativeDebugPath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Debug", "net10.0", "console_output.json");
+    var relativeReleasePath = Path.Combine(appHostDir, "..", "..", "..", "ConsoleRunner", "bin", "Release", "net10.0", "console_output.json");
+
     // Find the first existing file, or use Debug as default
     var outputFilePath = File.Exists(debugPath) ? debugPath :
                         File.Exists(releasePath) ? releasePath :
@@ -170,8 +169,8 @@ consoleAppBuilder.OnResourceReady(async (resource, readyEvent, cancellationToken
         fileWatcher.Dispose();
     }
     
-    // Read the file contents
-    string? outputText = null;
+    // Read and deserialize the result from the file
+    ConsoleResult? result = null;
     try
     {
         if (File.Exists(outputFilePath))
@@ -181,7 +180,8 @@ consoleAppBuilder.OnResourceReady(async (resource, readyEvent, cancellationToken
             {
                 try
                 {
-                    outputText = await File.ReadAllTextAsync(outputFilePath, cancellationToken);
+                    var jsonText = await File.ReadAllTextAsync(outputFilePath, cancellationToken);
+                    result = JsonSerializer.Deserialize<ConsoleResult>(jsonText);
                     break;
                 }
                 catch (IOException)
@@ -189,33 +189,67 @@ consoleAppBuilder.OnResourceReady(async (resource, readyEvent, cancellationToken
                     // File might still be locked, wait and retry
                     await Task.Delay(200, cancellationToken);
                 }
+                catch (JsonException ex)
+                {
+                    // JSON deserialization failed
+                    result = new ConsoleResult
+                    {
+                        Success = false,
+                        Input = "Unknown",
+                        Output = null,
+                        ErrorMessage = $"Failed to deserialize result: {ex.Message}"
+                    };
+                    break;
+                }
             }
         }
     }
     catch (Exception ex)
     {
         // Log error but continue
-        outputText = $"Error reading output file: {ex.Message}";
+        result = new ConsoleResult
+        {
+            Success = false,
+            Input = "Unknown",
+            Output = null,
+            ErrorMessage = $"Error reading output file: {ex.Message}"
+        };
     }
-    
-    // Display the captured console output via notification
-    if (!string.IsNullOrWhiteSpace(outputText))
+
+    // Display the result via appropriate notification
+    if (result != null)
     {
-        await interactionService.PromptNotificationAsync(
-            title: "Console App Output",
-            message: outputText.Trim(),
-            options: new NotificationInteractionOptions
-            {
-                Intent = MessageIntent.Success,
-                ShowSecondaryButton = false
-            });
+        if (result.Success)
+        {
+            // Success notification with output
+            await interactionService.PromptNotificationAsync(
+                title: "Console App Success",
+                message: result.Output ?? "Operation completed successfully.",
+                options: new NotificationInteractionOptions
+                {
+                    Intent = MessageIntent.Success,
+                    ShowSecondaryButton = false
+                });
+        }
+        else
+        {
+            // Failure notification with error message
+            await interactionService.PromptNotificationAsync(
+                title: "Console App Error",
+                message: result.ErrorMessage ?? "An unknown error occurred.",
+                options: new NotificationInteractionOptions
+                {
+                    Intent = MessageIntent.Error,
+                    ShowSecondaryButton = false
+                });
+        }
     }
     else
     {
-        // If no output captured, show a notification indicating completion but no output
+        // If no result captured, show a notification indicating completion but no result
         await interactionService.PromptNotificationAsync(
             title: "Console App Completed",
-            message: "The console app has completed execution, but no output was captured from the file.",
+            message: "The console app has completed execution, but no result was captured from the file.",
             options: new NotificationInteractionOptions
             {
                 Intent = MessageIntent.Information,

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
 using System.Diagnostics;
+using System.Text.Json;
+using AIObservabilityAndEvaluationWorkshop.Definitions;
 
 var builder = Host.CreateApplicationBuilder(args);
 
@@ -18,7 +20,7 @@ var logger = host.Services.GetRequiredService<ILogger<Program>>();
 logger.LogInformation("ConsoleRunner started");
 
 // Define output file path
-var outputFilePath = Path.Combine(AppContext.BaseDirectory, "console_output.txt");
+var outputFilePath = Path.Combine(AppContext.BaseDirectory, "console_output.json");
 
 // Create the root command
 var rootCommand = new RootCommand("Console application for displaying messages");
@@ -39,17 +41,46 @@ displayCommand.SetHandler(async (string message) =>
 
     Console.WriteLine(message);
 
+    // Create result object
+    var result = new ConsoleResult
+    {
+        Success = true,
+        Input = message,
+        Output = message,
+        ErrorMessage = null
+    };
+
     // Write to output file
     try
     {
-        var timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        var outputLine = $"[{timestamp}] {message}";
-        File.AppendAllText(outputFilePath, outputLine + Environment.NewLine);
+        var json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
+        await File.WriteAllTextAsync(outputFilePath, json);
     }
     catch (Exception ex)
     {
         commandLogger.LogError(ex, "Failed to write to output file");
+
+        // Write error result instead
+        var errorResult = new ConsoleResult
+        {
+            Success = false,
+            Input = message,
+            Output = null,
+            ErrorMessage = ex.Message
+        };
+
+        try
+        {
+            var errorJson = JsonSerializer.Serialize(errorResult, new JsonSerializerOptions { WriteIndented = true });
+            await File.WriteAllTextAsync(outputFilePath, errorJson);
+        }
+        catch (Exception innerEx)
+        {
+            commandLogger.LogError(innerEx, "Failed to write error result to output file");
+        }
     }
+
+    return;
 }, messageArgument);
 
 rootCommand.AddCommand(displayCommand);

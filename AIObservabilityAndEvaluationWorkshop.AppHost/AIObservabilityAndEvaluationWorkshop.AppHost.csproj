@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AIObservabilityAndEvaluationWorkshop.Definitions\AIObservabilityAndEvaluationWorkshop.Definitions.csproj" IsAspireProjectResource="false" />
     <ProjectReference Include="..\ConsoleRunner\AIObservabilityAndEvaluationWorkshop.ConsoleRunner.csproj" />
   </ItemGroup>
 

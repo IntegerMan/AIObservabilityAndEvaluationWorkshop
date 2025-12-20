@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AIObservabilityAndEvaluationWorkshop.Definitions\AIObservabilityAndEvaluationWorkshop.Definitions.csproj" />
     <ProjectReference Include="..\AIObservabilityAndEvaluationWorkshop.ServiceDefaults\AIObservabilityAndEvaluationWorkshop.ServiceDefaults.csproj" />
   </ItemGroup>
 

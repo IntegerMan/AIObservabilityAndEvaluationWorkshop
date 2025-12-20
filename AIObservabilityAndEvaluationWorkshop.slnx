@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="AIObservabilityAndEvaluationWorkshop.AppHost/AIObservabilityAndEvaluationWorkshop.AppHost.csproj" />
+  <Project Path="AIObservabilityAndEvaluationWorkshop.Definitions/AIObservabilityAndEvaluationWorkshop.Definitions.csproj" Id="31678f72-bf4b-46b4-9e98-df4b8d91025d" />
   <Project Path="AIObservabilityAndEvaluationWorkshop.ServiceDefaults/AIObservabilityAndEvaluationWorkshop.ServiceDefaults.csproj" />
   <Project Path="ConsoleRunner/AIObservabilityAndEvaluationWorkshop.ConsoleRunner.csproj" />
 </Solution>
