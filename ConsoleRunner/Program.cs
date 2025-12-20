@@ -6,10 +6,27 @@ using Microsoft.Extensions.Hosting;
 using System.CommandLine;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
+
+// Log OTEL configuration diagnostics before services are configured
+TelemetryDiagnostics.LogPreConfigurationDiagnostics(builder);
+
 builder.AddServiceDefaults();
+
+// Register DisplayCommand's ActivitySource with OpenTelemetry
+// The ServiceDefaults only registers the ApplicationName, but DisplayCommand uses its full type name
+builder.Services.AddOpenTelemetry()
+    .WithTracing(tracing =>
+    {
+        // Register the ActivitySource used by DisplayCommand
+        string displayCommandSourceName = typeof(DisplayCommand).FullName!;
+        tracing.AddSource(displayCommandSourceName);
+    });
 
 builder.Services.AddScoped<DisplayCommand>();
 IHost host = builder.Build();
+
+// Log telemetry status after services are configured
+TelemetryDiagnostics.LogPostConfigurationDiagnostics(host, builder);
 
 await host.StartAsync();
 
