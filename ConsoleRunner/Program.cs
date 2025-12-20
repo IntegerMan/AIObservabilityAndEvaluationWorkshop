@@ -46,6 +46,7 @@ displayCommand.SetHandler(async (message) =>
     if (!string.IsNullOrEmpty(outputFile))
     {
         commandLogger.LogInformation("Writing output to: {OutputFile}", outputFile);
+        Console.WriteLine($"ConsoleRunner: Writing to file: {outputFile}");
 
         // Create result object
         var result = new ConsoleResult
@@ -61,9 +62,11 @@ displayCommand.SetHandler(async (message) =>
         {
             var json = JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(outputFile, json);
+            Console.WriteLine($"ConsoleRunner: Successfully wrote {json.Length} characters to file");
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"ConsoleRunner: Failed to write to output file: {ex.Message}");
             commandLogger.LogError(ex, "Failed to write to output file");
 
             // Write error result instead
@@ -79,15 +82,18 @@ displayCommand.SetHandler(async (message) =>
             {
                 var errorJson = JsonSerializer.Serialize(errorResult, new JsonSerializerOptions { WriteIndented = true });
                 await File.WriteAllTextAsync(outputFile, errorJson);
+                Console.WriteLine($"ConsoleRunner: Wrote error result to file");
             }
             catch (Exception innerEx)
             {
+                Console.WriteLine($"ConsoleRunner: Failed to write error result: {innerEx.Message}");
                 commandLogger.LogError(innerEx, "Failed to write error result to output file");
             }
         }
     }
     else
     {
+        Console.WriteLine("ConsoleRunner: CONSOLE_OUTPUT_FILE environment variable not set, skipping output file write");
         commandLogger.LogWarning("CONSOLE_OUTPUT_FILE environment variable not set, skipping output file write");
     }
 }, messageArgument);
