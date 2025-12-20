@@ -7,11 +7,21 @@ using AIObservabilityAndEvaluationWorkshop.Definitions;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+string[] appArgs = [];
+
 // Add the console app project (without WithExplicitStart so it doesn't auto-start)
 IResourceBuilder<ProjectResource> consoleAppBuilder =
     builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-app")
         //.WithEnvironment("OTEL_EXPORTER_OTLP_ENDPOINT", "http://localhost:19288")
-        .WithExplicitStart();
+        .WithExplicitStart()
+        .WithArgs(context =>
+        {
+            context.Args.Clear();
+            foreach (var arg in appArgs)
+            {
+                context.Args.Add(arg);
+            }
+        });
 
 // Add a custom command that prompts for input and starts the resource
 consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async (context) =>
@@ -41,20 +51,23 @@ consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async (con
         return new ExecuteCommandResult { Success = false, ErrorMessage = "User cancelled input" };
     }
 
-    var message = result.Data?.Value ?? "Hello, World!";
+    appArgs = ["display", result.Data?.Value ?? "Hello, World!"];
 
-    // Configure the console app to run with the display command and message
-    consoleAppBuilder.WithArgs("display", message);
+    var commandService = context.ServiceProvider.GetRequiredService<ResourceCommandService>();
+    var resourceNotificationService = context.ServiceProvider.GetRequiredService<ResourceNotificationService>();
+    if (resourceNotificationService.TryGetCurrentState(context.ResourceName, out var state)
+        && state.Snapshot.State?.Text == KnownResourceStates.NotStarted)
+    {
+        return await commandService.ExecuteCommandAsync(context.ResourceName, "resource-start");
+    }
 
-    // Show a notification with the message
-    await interactionService.PromptNotificationAsync("Input Received",
-        $"You entered: '{message}'. Starting the console app...", new NotificationInteractionOptions()
-        {
-            Intent = MessageIntent.Information,
-            ShowSecondaryButton = false,
-        });
-
-    return new ExecuteCommandResult { Success = true };
+    return await commandService.ExecuteCommandAsync(context.ResourceName, "resource-restart");
+},
+new CommandOptions
+{
+    Description = "Configure the console app with user input and start it",
+    IconName = "Play",
+    IsHighlighted = true
 });
 
 // Subscribe to console app resource ready event to capture and display output after completion
