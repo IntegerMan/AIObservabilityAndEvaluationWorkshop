@@ -1,4 +1,6 @@
 using AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
+using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
+using AIObservabilityAndEvaluationWorkshop.Definitions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.CommandLine;
@@ -8,7 +10,14 @@ using System.Diagnostics;
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
-builder.Services.AddScoped<DisplayCommand>();
+builder.Services.AddScoped<ExecuteLessonCommand>();
+
+builder.Services.Scan(scan => scan
+    .FromAssemblyOf<LessonA>()
+    .AddClasses(classes => classes.AssignableTo<LessonBase>())
+    .As<LessonBase>()
+    .WithScopedLifetime());
+
 IHost host = builder.Build();
 
 // Log OTEL environment variables on startup
@@ -16,19 +25,19 @@ TelemetryDiagnostics.LogOtelEnvironmentVariables(host.Services.GetRequiredServic
 
 await host.StartAsync();
 
-// Add the display command that allows users to send an input in through a message parameter
-Command displayCommand = new("display", "Display a message and lesson ID");
-Argument<string> messageArgument = new ("message", "The message to display");
-Argument<string> lessonIdArgument = new ("lesson-id", "The lesson ID (A, B, or C)");
-displayCommand.AddArgument(messageArgument);
-displayCommand.AddArgument(lessonIdArgument);
+// Add the execute-lesson command that allows users to send an input in through a message parameter
+Command executeLessonCommand = new("execute-lesson", "Execute a lesson with a message");
+Argument<string> messageArgument = new ("message", "The message to pass to the lesson");
+Argument<string> lessonIdArgument = new ("lesson-id", "The lesson ID");
+executeLessonCommand.AddArgument(messageArgument);
+executeLessonCommand.AddArgument(lessonIdArgument);
 
-DisplayCommand command = host.Services.GetRequiredService<DisplayCommand>();
-displayCommand.SetHandler(command.ExecuteAsync, messageArgument, lessonIdArgument);
+ExecuteLessonCommand command = host.Services.GetRequiredService<ExecuteLessonCommand>();
+executeLessonCommand.SetHandler(command.ExecuteAsync, messageArgument, lessonIdArgument);
 
 // Create the root command that routes inputs to other commands
-RootCommand rootCommand = new("Console application for displaying messages");
-rootCommand.AddCommand(displayCommand);
+RootCommand rootCommand = new("Console application for running lessons");
+rootCommand.AddCommand(executeLessonCommand);
 
 // Add default handler for when no command is specified
 rootCommand.SetHandler(async () =>

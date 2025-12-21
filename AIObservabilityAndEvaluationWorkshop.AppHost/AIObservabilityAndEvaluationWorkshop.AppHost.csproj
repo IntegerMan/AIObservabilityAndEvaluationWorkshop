@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="13.1.0" />
     <PackageReference Include="C3D.Extensions.Aspire.OutputWatcher" Version="0.1.17" />
+    <PackageReference Include="Scrutor" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,7 @@
 
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Projects;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -13,6 +14,12 @@ internal partial class Program
     private static void Main(string[] args)
     {
         IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
+
+        builder.Services.Scan(scan => scan
+            .FromAssemblyOf<ConsoleResult>()
+            .AddClasses(classes => classes.AssignableTo<LessonBase>())
+            .As<LessonBase>()
+            .WithSingletonLifetime());
 
         string[] appArgs = [];
 
@@ -122,6 +129,14 @@ internal partial class Program
             }
 
             // Prompt the user for lesson choice
+            var lessons = context.ServiceProvider.GetServices<LessonBase>().OrderBy(l => l.Id).ToList();
+            var options = lessons.Select(l => new KeyValuePair<string, string>(l.Id, l.DisplayName)).ToArray();
+
+            if (options.Length == 0)
+            {
+                return new ExecuteCommandResult { Success = false, ErrorMessage = "No lessons found via discovery." };
+            }
+
             InteractionResult<InteractionInput> lessonResult = await interactionService.PromptInputAsync(
                 title: "Lesson Selection",
                 message: "Please select a lesson:",
@@ -130,11 +145,7 @@ internal partial class Program
                     Name = "LessonId",
                     InputType = InputType.Choice,
                     Required = true,
-                    Options = [
-                        new("A", "Lesson A"), 
-                        new("B", "Lesson B"), 
-                        new("C", "Lesson C")
-                    ]
+                    Options = options
                 });
 
             if (lessonResult.Canceled)
@@ -161,7 +172,7 @@ internal partial class Program
 
             string lessonId = lessonResult.Data?.Value ?? "A";
             string message = messageResult.Data?.Value ?? "Hello, World!";
-            appArgs = ["display", message, lessonId];
+            appArgs = ["execute-lesson", message, lessonId];
 
             Console.WriteLine($"AppHost: Starting console app with args: {string.Join(", ", appArgs)}");
 
