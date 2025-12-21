@@ -48,33 +48,36 @@ internal partial class Program
                                     switch (result.Success)
                                     {
                                         case true when !string.IsNullOrWhiteSpace(result.Output):
-                                            await interactionSvc.PromptNotificationAsync(
+                                            await interactionSvc.PromptMessageBoxAsync(
                                                 title: $"{lessonTitlePrefix}Completed",
                                                 message: result.Output,
-                                                options: new NotificationInteractionOptions
+                                                options: new MessageBoxInteractionOptions
                                                 {
                                                     Intent = MessageIntent.Success,
-                                                    ShowSecondaryButton = false
+                                                    EnableMessageMarkdown = true,
+                                                    PrimaryButtonText = "OK"
                                                 }, cancellationToken: ct);
                                             break;
                                         case true when string.IsNullOrWhiteSpace(result.Output):
-                                            await interactionSvc.PromptNotificationAsync(
+                                            await interactionSvc.PromptMessageBoxAsync(
                                                 title: $"{lessonTitlePrefix}No Output",
                                                 message: "The operation completed, but produced no output",
-                                                options: new NotificationInteractionOptions
+                                                options: new MessageBoxInteractionOptions
                                                 {
                                                     Intent = MessageIntent.Warning,
-                                                    ShowSecondaryButton = false
+                                                    EnableMessageMarkdown = false,
+                                                    PrimaryButtonText = "OK"
                                                 }, cancellationToken: ct);
                                             break;
                                         default:
-                                            await interactionSvc.PromptNotificationAsync(
+                                            await interactionSvc.PromptMessageBoxAsync(
                                                 title: $"{lessonTitlePrefix}Error",
                                                 message: result.ErrorMessage ?? "An unknown error occurred.",
-                                                options: new NotificationInteractionOptions
+                                                options: new MessageBoxInteractionOptions
                                                 {
                                                     Intent = MessageIntent.Error,
-                                                    ShowSecondaryButton = false
+                                                    EnableMessageMarkdown = false,
+                                                    PrimaryButtonText = "OK"
                                                 }, cancellationToken: ct);
                                             break;
                                     }
@@ -136,7 +139,6 @@ internal partial class Program
 
             if (lessonResult.Canceled)
             {
-                await interactionService.PromptNotificationAsync("Cancelled", "Operation cancelled by user.");
                 return new ExecuteCommandResult { Success = false, ErrorMessage = "User cancelled lesson selection" };
             }
 
@@ -154,7 +156,6 @@ internal partial class Program
 
             if (messageResult.Canceled)
             {
-                await interactionService.PromptNotificationAsync("Cancelled", "Operation cancelled by user.");
                 return new ExecuteCommandResult { Success = false, ErrorMessage = "User cancelled message input" };
             }
 
