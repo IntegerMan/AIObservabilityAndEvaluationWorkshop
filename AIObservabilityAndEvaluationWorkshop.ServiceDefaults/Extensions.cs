@@ -57,7 +57,8 @@ public static class Extensions
             {
                 metrics.AddAspNetCoreInstrumentation()
                     .AddHttpClientInstrumentation()
-                    .AddRuntimeInstrumentation();
+                    .AddRuntimeInstrumentation()
+                    .AddMeter("AIObservabilityAndEvaluationWorkshop.*");
             })
             .WithTracing(tracing =>
             {

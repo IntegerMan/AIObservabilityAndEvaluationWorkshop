@@ -8,8 +8,7 @@ This document contains the rough outline of the workshop in sequential order.
 |--------------------------------|----------------|---------------------------------------------------------------|
 | Hello Aspire and AppHost files | No Lesson File | Launch dashboard and look at AppHost.cs                       |
 | OpenTelemetry Traces and Logs  | Completed      | Run app without using the custom command                      |
-| OpenTelemtry Activities        | Planned        | Show traces for different nested methods with tags and events |
-| OpenTelemtry Metrics           | Planned        | Make up metrics of each type                                  |
+| OpenTelemetry Deep Dive       | Completed      | Activities, events, metrics, tags, and nested traces          |
 | Hello MEAI                     | Planned        | Use the Ollama model here, likely. Just a Hello World         |
 | MEAI Observability             | Planned        | Hello world, but with OTel behind it                          |
 | MEAI with Tools                | Planned        | Add a simple pair of tools to call                            |
