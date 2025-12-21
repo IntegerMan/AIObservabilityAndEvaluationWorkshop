@@ -11,16 +11,15 @@ public class AspireService(ActivitySource activitySource, ILogger logger, string
 
     public void LogResult(
         ConsoleResult result,
-        string activityName = "AspireService.Log",
         params (string Key, object? Value)[] activityTags)
     {
         // Create a named activity for better trace visibility
-        using Activity? activity = activitySource.StartActivity(activityName);
+        using Activity? activity = activitySource.StartActivity("Report to Aspire");
 
         // Set activity tags
         if (activity is not null && activityTags.Length > 0)
         {
-            foreach (var (key, value) in activityTags)
+            foreach ((string key, object? value) in activityTags)
             {
                 activity.SetTag(key, value);
             }
@@ -57,10 +56,10 @@ public class AspireService(ActivitySource activitySource, ILogger logger, string
             LessonId = lessonId
         };
 
-        LogResult(result, activityName, activityTags);
+        LogResult(result, activityTags);
     }
 
-    public void LogError(string? errorMessage, string? lessonId, string activityName = "AspireService.LogError", params (string Key, object? Value)[] activityTags)
+    public void LogError(string? errorMessage, string? lessonId, params (string Key, object? Value)[] activityTags)
     {
         ConsoleResult result = new()
         {
@@ -71,6 +70,6 @@ public class AspireService(ActivitySource activitySource, ILogger logger, string
             LessonId = lessonId
         };
 
-        LogResult(result, activityName, activityTags);
+        LogResult(result, activityTags);
     }
 }

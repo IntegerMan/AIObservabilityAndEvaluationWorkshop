@@ -52,7 +52,6 @@ rootCommand.SetHandler(async () =>
     aspireService.LogError(
         "Please use the 'Start with Input' command to run this application",
         null,
-        "DefaultCommand.Execute",
         ("command.name", "default")
     );
 

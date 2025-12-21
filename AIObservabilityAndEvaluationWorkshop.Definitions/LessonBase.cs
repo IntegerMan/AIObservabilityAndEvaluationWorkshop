@@ -7,29 +7,27 @@ public abstract class LessonBase
 {
     public abstract string DisplayName { get; }
 
-    private static readonly ActivitySource ActivitySource = new("AIObservabilityAndEvaluationWorkshop.Lessons");
+    private readonly ActivitySource _activitySource;
+
+    protected LessonBase()
+    {
+        _activitySource = new ActivitySource(this.GetType().FullName!);
+    }
 
     public async Task<ConsoleResult> ExecuteAsync(string message, ILogger logger)
     {
-        using var activity = ActivitySource.StartActivity($"Lesson.{DisplayName}.Execute");
-        if (activity == null && Activity.Current != null)
-        {
-            // If StartActivity returned null (e.g. no listeners), but there is a current activity,
-            // it means we might want to manually create one if we want to ensure nesting, 
-            // but usually StartActivity is what we want. 
-            // In .NET, if a listener is active, it will automatically parent to Activity.Current.
-        }
+        using Activity? activity = _activitySource.StartActivity($"Executing Lesson {DisplayName}");
         
         activity?.SetTag("lesson.display_name", DisplayName);
         activity?.SetTag("input.message", message);
 
-        logger.LogInformation("Starting lesson: {DisplayName}", DisplayName);
+        logger.LogDebug("Starting lesson: {DisplayName}", DisplayName);
 
         try
         {
-            var output = await RunAsync(message);
+            string output = await RunAsync(message);
             
-            var result = new ConsoleResult
+            ConsoleResult result = new()
             {
                 Success = true,
                 Output = output,
