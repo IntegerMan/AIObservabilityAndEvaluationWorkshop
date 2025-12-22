@@ -129,3 +129,32 @@ If you are running on a machine with an SSL-inspecting proxy (common in some cor
 ```
 
 This will configure the application to bypass certificate validation for Azure and OpenAI connections.
+
+## Technical Details: User Interaction
+
+This project uses .NET Aspire's Interaction Service to facilitate communication between the user and the console application via the Aspire Dashboard.
+
+### Interaction Flow
+
+1. **User Input**: The user triggers the `start-with-input` command on the `console-app` resource in the Aspire Dashboard.
+2. **Prompts**: `AppHost` uses `IInteractionService` to display input dialogs to the user for lesson selection and any required text input.
+3. **Execution**: The inputs are passed as command-line arguments to the `ConsoleRunner` project, which is then started.
+4. **Capturing Output**: The `ConsoleRunner` performs its task and outputs a JSON-formatted result to the standard output. `AppHost` captures this using `WithOutputWatcher` and a regular expression.
+5. **Displaying Results**: `AppHost` deserializes the JSON and uses `IInteractionService.PromptMessageBoxAsync` to display the final result (or error) back to the user in the dashboard.
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant AppHost as AppHost (Aspire)
+    participant Console as ConsoleRunner
+    
+    User->>AppHost: Trigger 'Start with Input'
+    AppHost->>User: Prompt for Lesson & Input
+    User->>AppHost: Provide Input
+    AppHost->>Console: Start with Arguments
+    Console->>Console: Execute Lesson
+    Console-->>AppHost: Output JSON Result
+    AppHost->>User: Display Result Message Box
+```
+
+For more details on the implementation, see `AIObservabilityAndEvaluationWorkshop.AppHost/AppHost.cs`.
