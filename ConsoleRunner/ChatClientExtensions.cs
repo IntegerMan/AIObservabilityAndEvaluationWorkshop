@@ -1,4 +1,6 @@
 using System.ClientModel;
+using System.ClientModel.Primitives;
+using System.Net.Http;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Extensions.AI;
@@ -22,6 +24,7 @@ public static class ChatClientExtensions
             string? endpoint = configuration["AIEndpoint"];
             string? key = configuration["AIKey"];
             bool useIdentity = configuration.GetValue("AIUseIdentity", false);
+            bool allowUntrustedCertificates = configuration.GetValue("AllowUntrustedCertificates", false);
 
             if (aiProvider.Equals("Azure", StringComparison.OrdinalIgnoreCase))
             {
@@ -30,13 +33,22 @@ public static class ChatClientExtensions
                     throw new InvalidOperationException("Azure OpenAI requires an endpoint.");
                 }
 
+                AzureOpenAIClientOptions azureOptions = new();
+                if (allowUntrustedCertificates)
+                {
+                    azureOptions.Transport = new HttpClientPipelineTransport(new HttpClient(new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    }));
+                }
+
                 if (useIdentity)
                 {
-                    client = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential()).GetChatClient(modelName).AsIChatClient();
+                    client = new AzureOpenAIClient(new Uri(endpoint), new DefaultAzureCredential(), azureOptions).GetChatClient(modelName).AsIChatClient();
                 }
                 else if (!string.IsNullOrEmpty(key))
                 {
-                    client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key)).GetChatClient(modelName).AsIChatClient();
+                    client = new AzureOpenAIClient(new Uri(endpoint), new ApiKeyCredential(key), azureOptions).GetChatClient(modelName).AsIChatClient();
                 }
                 else
                 {
@@ -50,13 +62,21 @@ public static class ChatClientExtensions
                     throw new InvalidOperationException("OpenAI requires an API Key.");
                 }
 
-                OpenAIClientOptions? options = null;
+                OpenAIClientOptions openaiOptions = new();
                 if (!string.IsNullOrEmpty(endpoint))
                 {
-                    options = new OpenAIClientOptions { Endpoint = new Uri(endpoint) };
+                    openaiOptions.Endpoint = new Uri(endpoint);
                 }
 
-                client = new OpenAIClient(new ApiKeyCredential(key), options).GetChatClient(modelName).AsIChatClient();
+                if (allowUntrustedCertificates)
+                {
+                    openaiOptions.Transport = new HttpClientPipelineTransport(new HttpClient(new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                    }));
+                }
+
+                client = new OpenAIClient(new ApiKeyCredential(key), openaiOptions).GetChatClient(modelName).AsIChatClient();
             }
             else
             {

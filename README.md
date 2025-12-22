@@ -46,3 +46,23 @@ Alternatively, you can run the provided helper script:
 ```bash
 ./fix-inotify-limit.sh
 ```
+
+#### SSL Connection Issues (UntrustedRoot) on Linux
+
+If you are running on a machine with an SSL-inspecting proxy (common in some corporate environments or workshops) and you get an exception similar to:
+`System.Security.Authentication.AuthenticationException: The remote certificate is invalid because of errors in the certificate chain: UntrustedRoot`
+
+**Solution:** Enable the `AllowUntrustedCertificates` parameter.
+
+1. Locate the `AIObservabilityAndEvaluationWorkshop.AppHost/appsettings.json` file.
+2. Under the `Parameters` section, set `"AllowUntrustedCertificates"` to `"true"`.
+
+```json
+{
+  "Parameters": {
+    "AllowUntrustedCertificates": "true"
+  }
+}
+```
+
+This will configure the application to bypass certificate validation for Azure and OpenAI connections.

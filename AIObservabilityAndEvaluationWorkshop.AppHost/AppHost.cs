@@ -16,6 +16,7 @@ var aiModel = builder.AddParameter("AIModel", secret: false);
 var aiEndpoint = builder.AddParameter("AIEndpoint", secret: false);
 var aiKey = builder.AddParameter("AIKey", secret: true);
 var aiUseIdentity = builder.AddParameter("AIUseAzureIdentity", secret: false);
+var allowUntrustedCertificates = builder.AddParameter("AllowUntrustedCertificates", secret: false);
 
 var ollama = builder.AddOllama("ollama")
     .WithDataVolume("ollama-data");
@@ -47,6 +48,7 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         .WithEnvironment("AIEndpoint", aiEndpoint)
         .WithEnvironment("AIKey", aiKey)
         .WithEnvironment("AIUseIdentity", aiUseIdentity)
+        .WithEnvironment("AllowUntrustedCertificates", allowUntrustedCertificates)
         .WithExplicitStart()
         .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "json")
         .OnMatched(async (e, ct) =>
