@@ -29,7 +29,7 @@ if (!Uri.TryCreate(ollamaEndpoint, UriKind.Absolute, out Uri? ollamaUri))
 }
 
 builder.Services.AddChatClient(new OllamaChatClient(ollamaUri, modelName))
-    .UseOpenTelemetry();
+    .UseOpenTelemetry(configure: o => o.EnableSensitiveData = true);
 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<HelloWorkshop>()
