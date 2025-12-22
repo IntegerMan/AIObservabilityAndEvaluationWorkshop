@@ -10,6 +10,8 @@ This document contains the rough outline of the workshop in sequential order.
 | OpenTelemetry Traces and Logs  | Completed      | Run app without using the custom command                      |
 | OpenTelemetry Deep Dive       | Completed      | Activities, events, metrics, tags, and nested traces          |
 | Hello MEAI                     | Planned        | Use the Ollama model here, likely. Just a Hello World         |
+| MEAI System Prompt             | Planned        | Give the AI a bit of flavor                                   |
+| MEAI Conversation History      | Planned        | System prompt + simulated conversation history                |
 | MEAI Observability             | Planned        | Hello world, but with OTel behind it                          |
 | MEAI with Tools                | Planned        | Add a simple pair of tools to call                            |
 | EXERCISE 1                     | Planned        | CodeMash schedule chat bot?                                   |

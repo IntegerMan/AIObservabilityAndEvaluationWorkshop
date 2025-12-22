@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(1, 8, "Setup for Cloud AI", needsInput: false)]
+[Lesson(1, 10, "Setup for Cloud AI", needsInput: false)]
 public class SetupForCloudAILesson : LessonBase
 {
     protected override Task<string> RunAsync(string message)
