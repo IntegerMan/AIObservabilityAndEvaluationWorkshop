@@ -6,10 +6,19 @@ using Projects;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.AppHost;
 using Microsoft.Extensions.AI;
+using Microsoft.Extensions.Logging;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
-builder.Services.AddChatClient(new Microsoft.Extensions.AI.OllamaChatClient(new Uri("http://localhost:11434"), "llama3.2"));
+builder.Services.AddChatClient(sp => new Microsoft.Extensions.AI.OllamaChatClient(new Uri("http://localhost:11434"), "llama3.2"))
+    .Use((inner, sp) =>
+    {
+        var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+        return new OpenTelemetryChatClient(inner, loggerFactory.CreateLogger("Microsoft.Extensions.AI"))
+        {
+            EnableSensitiveData = true
+        };
+    });
 
 var ollama = builder.AddOllama("ollama")
     .WithDataVolume("ollama-data");

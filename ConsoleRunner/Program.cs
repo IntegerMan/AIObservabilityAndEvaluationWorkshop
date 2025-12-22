@@ -29,7 +29,14 @@ if (!Uri.TryCreate(ollamaEndpoint, UriKind.Absolute, out Uri? ollamaUri))
 }
 
 builder.Services.AddChatClient(sp => new OllamaChatClient(ollamaUri, modelName))
-    .UseOpenTelemetry(sourceName: "Microsoft.Extensions.AI", configure: o => o.EnableSensitiveData = true);
+    .Use((inner, sp) =>
+    {
+        var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
+        return new OpenTelemetryChatClient(inner, loggerFactory.CreateLogger("Microsoft.Extensions.AI"))
+        {
+            EnableSensitiveData = true
+        };
+    });
 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<HelloWorkshop>()
