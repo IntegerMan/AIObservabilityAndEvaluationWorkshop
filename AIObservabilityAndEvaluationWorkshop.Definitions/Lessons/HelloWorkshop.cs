@@ -4,12 +4,9 @@ using JetBrains.Annotations;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
+[Lesson("Hello Aspire and OpenTelemetry", needsInput: false)]
 public class HelloWorkshop : LessonBase
 {
-    public override string DisplayName => "Hello Aspire and OpenTelemetry";
-
-    public override bool NeedsInput => false;
-
     protected override Task<string> RunAsync(string message)
     {
         return Task.FromResult("""

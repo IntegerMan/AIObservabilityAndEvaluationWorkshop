@@ -1,13 +1,16 @@
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions;
 
 public abstract class LessonBase
 {
-    public abstract string DisplayName { get; }
+    public virtual string DisplayName => 
+        this.GetType().GetCustomAttribute<LessonAttribute>()?.DisplayName ?? this.GetType().Name;
 
-    public virtual bool NeedsInput => true;
+    public virtual bool NeedsInput => 
+        this.GetType().GetCustomAttribute<LessonAttribute>()?.NeedsInput ?? true;
 
     private readonly ActivitySource _activitySource;
 

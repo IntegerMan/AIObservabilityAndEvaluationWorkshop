@@ -8,12 +8,9 @@ using OpenTelemetry.Trace;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
+[Lesson("OpenTelemetry Deep Dive", needsInput: false)]
 public class OpenTelemetryDeepDive : LessonBase
 {
-    public override string DisplayName => "OpenTelemetry Deep Dive";
-
-    public override bool NeedsInput => false;
-    
     private readonly ActivitySource _activitySource;
     private readonly Meter _meter;
     

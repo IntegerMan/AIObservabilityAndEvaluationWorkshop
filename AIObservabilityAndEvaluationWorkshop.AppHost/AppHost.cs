@@ -5,30 +5,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Projects;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.AppHost;
-using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Logging;
+using System.Reflection;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
-
-builder.Services.AddChatClient(sp => new Microsoft.Extensions.AI.OllamaChatClient(new Uri("http://localhost:11434"), "llama3.2"))
-    .Use((inner, sp) =>
-    {
-        var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
-        return new OpenTelemetryChatClient(inner, loggerFactory.CreateLogger("Microsoft.Extensions.AI"))
-        {
-            EnableSensitiveData = true
-        };
-    });
 
 var ollama = builder.AddOllama("ollama")
     .WithDataVolume("ollama-data");
 var llama = ollama.AddModel("llama3.2");
 
-builder.Services.Scan(scan => scan
-    .FromAssemblyOf<ConsoleResult>()
-    .AddClasses(classes => classes.AssignableTo<LessonBase>())
-    .As<LessonBase>()
-    .WithSingletonLifetime());
+// Get the assembly where LessonBase is defined
+Assembly assembly = typeof(LessonBase).Assembly;
+
+// Discover lessons and their metadata via reflection
+var lessons = assembly.GetTypes()
+    .Select(t => new { Type = t, Attribute = t.GetCustomAttribute<LessonAttribute>() })
+    .Where(x => x.Attribute != null)
+    .Select(x => x.Attribute!)
+    .OrderBy(a => a.DisplayName)
+    .ToList();
 
 string[] appArgs = [];
 
@@ -141,7 +135,6 @@ consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async (con
         }
 
         // Prompt the user for lesson choice
-        List<LessonBase> lessons = context.ServiceProvider.GetServices<LessonBase>().OrderBy(l => l.DisplayName).ToList();
         KeyValuePair<string, string>[] options = lessons.Select(l => new KeyValuePair<string, string>(l.DisplayName, l.DisplayName)).ToArray();
 
         if (options.Length == 0)
@@ -166,7 +159,7 @@ consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async (con
         }
 
         string displayName = lessonResult.Data?.Value ?? options[0].Key;
-        LessonBase selectedLesson = lessons.First(l => l.DisplayName == displayName);
+        LessonAttribute selectedLesson = lessons.First(l => l.DisplayName == displayName);
 
         string message = "No Input needed";
         if (selectedLesson.NeedsInput)
