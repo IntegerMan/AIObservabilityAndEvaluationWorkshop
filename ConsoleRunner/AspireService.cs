@@ -1,7 +1,7 @@
-using AIObservabilityAndEvaluationWorkshop.Definitions;
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Text.Json;
+using AIObservabilityAndEvaluationWorkshop.Definitions;
+using Microsoft.Extensions.Logging;
 
 namespace AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
 

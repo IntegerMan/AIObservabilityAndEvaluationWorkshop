@@ -1,22 +1,22 @@
-using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions;
 
 public abstract class LessonBase
 {
     public virtual string DisplayName => 
-        this.GetType().GetCustomAttribute<LessonAttribute>()?.DisplayName ?? this.GetType().Name;
+        GetType().GetCustomAttribute<LessonAttribute>()?.DisplayName ?? GetType().Name;
 
     public virtual bool NeedsInput => 
-        this.GetType().GetCustomAttribute<LessonAttribute>()?.NeedsInput ?? true;
+        GetType().GetCustomAttribute<LessonAttribute>()?.NeedsInput ?? true;
 
     private readonly ActivitySource _activitySource;
 
     protected LessonBase()
     {
-        _activitySource = new ActivitySource(this.GetType().FullName!);
+        _activitySource = new ActivitySource(GetType().FullName!);
     }
 
     public async Task<ConsoleResult> ExecuteAsync(string message, ILogger logger)

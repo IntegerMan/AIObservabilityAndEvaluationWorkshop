@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using AIObservabilityAndEvaluationWorkshop.Definitions;
 using JetBrains.Annotations;
-using Microsoft.Extensions.Logging;
 using OpenTelemetry.Trace;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
@@ -18,7 +16,7 @@ public class OpenTelemetryDeepDive : LessonBase
     private readonly Counter<long> _requestCounter;
     private readonly Histogram<double> _processingTimeHistogram;
     private readonly UpDownCounter<long> _activeRequestsCounter;
-    private long _simulatedQueueLength = 0;
+    private long _simulatedQueueLength;
 
     public OpenTelemetryDeepDive()
     {

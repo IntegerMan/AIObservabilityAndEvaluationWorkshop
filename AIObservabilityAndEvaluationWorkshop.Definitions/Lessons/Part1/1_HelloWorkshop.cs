@@ -1,4 +1,3 @@
-using AIObservabilityAndEvaluationWorkshop.Definitions;
 using JetBrains.Annotations;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;

@@ -1,4 +1,3 @@
-using AIObservabilityAndEvaluationWorkshop.Definitions;
 using JetBrains.Annotations;
 using Microsoft.Extensions.AI;
 

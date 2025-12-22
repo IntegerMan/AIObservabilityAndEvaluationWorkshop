@@ -1,15 +1,21 @@
 #pragma warning disable ASPIREINTERACTION001 // Interaction Service is for evaluation purposes only
 
+using System.Reflection;
+using System.Text.Json;
+using AIObservabilityAndEvaluationWorkshop.AppHost;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using Microsoft.Extensions.DependencyInjection;
 using Projects;
-using System.Text.Json;
-using AIObservabilityAndEvaluationWorkshop.AppHost;
-using System.Reflection;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
 var enableSensitiveDataLogging = builder.AddParameter("EnableSensitiveDataLogging", secret: false);
+
+var aiProvider = builder.AddParameter("AIProvider", secret: false);
+var aiModel = builder.AddParameter("AIModel", secret: false);
+var aiEndpoint = builder.AddParameter("AIEndpoint", secret: false);
+var aiKey = builder.AddParameter("AIKey", secret: true);
+var aiUseIdentity = builder.AddParameter("AIUseAzureIdentity", secret: false);
 
 var ollama = builder.AddOllama("ollama")
     .WithDataVolume("ollama-data");
@@ -36,6 +42,11 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         .WithReference(ollama)
         .WithEnvironment("AI_MODEL", "llama3.2")
         .WithEnvironment("EnableSensitiveDataLogging", enableSensitiveDataLogging)
+        .WithEnvironment("AIProvider", aiProvider)
+        .WithEnvironment("AIModel", aiModel)
+        .WithEnvironment("AIEndpoint", aiEndpoint)
+        .WithEnvironment("AIKey", aiKey)
+        .WithEnvironment("AIUseIdentity", aiUseIdentity)
         .WithExplicitStart()
         .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "json")
         .OnMatched(async (e, ct) =>
@@ -129,7 +140,7 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         });
 
 // Add a custom command that prompts for input and starts the resource
-consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async (context) =>
+consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async context =>
     {
         IInteractionService interactionService = context.ServiceProvider.GetRequiredService<IInteractionService>();
 

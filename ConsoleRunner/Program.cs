@@ -1,46 +1,18 @@
+using System.CommandLine;
+using System.Diagnostics;
 using AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
-using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
+using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.CommandLine;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
-using Microsoft.Extensions.AI;
-using Microsoft.Extensions.Configuration;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 builder.AddServiceDefaults();
 builder.Services.AddScoped<ExecuteLessonCommand>();
 
-string modelName = builder.Configuration["AI_MODEL"] ?? "llama3.2";
-
-string ollamaEndpoint = builder.Configuration.GetConnectionString(modelName) 
-                     ?? builder.Configuration.GetConnectionString("ollama") 
-                     ?? "http://localhost:11434";
-
-Console.WriteLine($"[DEBUG_LOG] Resolved ollamaEndpoint: '{ollamaEndpoint}'");
-
-if (!Uri.TryCreate(ollamaEndpoint, UriKind.Absolute, out Uri? ollamaUri))
-{
-    Console.WriteLine($"[DEBUG_LOG] Invalid URI '{ollamaEndpoint}', falling back to http://localhost:11434");
-    ollamaUri = new Uri("http://localhost:11434");
-}
-
-builder.Services.AddChatClient(sp => new OllamaChatClient(ollamaUri, modelName))
-    .UseFunctionInvocation()
-    .Use((inner, sp) =>
-    {
-        var loggerFactory = sp.GetRequiredService<ILoggerFactory>();
-        var configuration = sp.GetRequiredService<IConfiguration>();
-        bool enableSensitiveData = configuration.GetValue<bool>("EnableSensitiveDataLogging", true);
-
-        return new OpenTelemetryChatClient(inner, loggerFactory.CreateLogger("Microsoft.Extensions.AI"))
-        {
-            EnableSensitiveData = enableSensitiveData
-        };
-    });
+builder.Services.AddConfiguredChatClient(builder.Configuration);
 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<HelloWorkshop>()
