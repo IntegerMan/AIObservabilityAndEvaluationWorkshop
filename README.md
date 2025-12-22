@@ -16,7 +16,70 @@ Some examples will use containerized resources. For these you will need either:
 
 We recommend launching the application in advance with a stable internet connection to allow the appropriate container images to be downloaded.
 
-**Cloud Resource recommendations coming soon...**
+### Azure Cloud Resources (Optional)
+
+While this workshop can be run using local models via Ollama, using advanced cloud-based models will provide more accurate evaluations and better overall performance. We recommend setting up an Azure OpenAI resource if you have access to one.
+
+> [!NOTE]
+> Azure resources may have an associated cost, including per-use costs with the base model LLMs. Monitor your usage and set up budget alerts if necessary.
+
+#### Setting up Azure OpenAI
+
+1. **Search the Marketplace**: In the Azure Portal, search for "Azure OpenAI" in the Marketplace.
+
+   ![Marketplace](Images/AzMarketplace.png)
+
+2. **Create the Resource**: Create a new Azure OpenAI resource. We recommend creating a new resource group for this workshop to make cleanup easier later.
+
+   ![Create Azure OpenAI](Images/AzOpenAICreate.png)
+
+3. **Get Keys and Endpoints**: Once the resource is created, navigate to **Keys and Endpoint** under Resource Management. You will need your Endpoint and one of your Keys.
+
+   ![Keys and Endpoints](Images/AzKeysAndEndpoints.png)
+
+4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We recommend using **gpt-5.2-chat** (or the latest available GPT-4o variant if gpt-5.2 is not yet available) and keeping the default deployment name.
+
+   ![Create Project](AzCreateProject.png)
+   ![Build in Foundry](AzFoundryBuild.png)
+
+#### Configuring the Application
+
+To use your Azure OpenAI deployment, update the `AIObservabilityAndEvaluationWorkshop.AppHost/appsettings.json` file.
+
+> [!WARNING]
+> Your `AIKey` is sensitive information. **Never commit your API key to version control.**
+
+#### Using User Secrets (Recommended)
+
+Instead of putting your key in `appsettings.json`, we recommend using [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-9.0&tabs=linux) to store your sensitive configuration locally.
+
+To set your key using the command line, run the following from the `AIObservabilityAndEvaluationWorkshop.AppHost` directory:
+
+```bash
+dotnet user-secrets set "Parameters:AIKey" "your-key-goes-here"
+```
+
+#### Manual Configuration
+
+If you choose to use `appsettings.json`, update the following fields:
+
+1. Change `AIProvider` to `"AzureOpenAI"`.
+2. Change `AIModel` to your deployment name (e.g., `"gpt-5.2-chat"`).
+3. Set `AIEndpoint` to your Azure OpenAI endpoint URL.
+4. Set `AIKey` to your Azure OpenAI key.
+
+```json
+{
+  "Parameters": {
+    "AIProvider": "AzureOpenAI",
+    "AIModel": "gpt-5.2-chat",
+    "AIEndpoint": "https://your-resource-name.openai.azure.com/",
+    "AIKey": "your-key-goes-here"
+  }
+}
+```
+
+Alternatively, if you have the Azure CLI installed and are logged in, you can set `AIUseAzureIdentity` to `"true"` and leave `AIKey` blank to use Managed Identity / Entra ID authentication.
 
 ### Troubleshooting
 
