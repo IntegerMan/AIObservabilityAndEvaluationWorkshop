@@ -17,6 +17,8 @@ var aiEndpoint = builder.AddParameter("AIEndpoint", secret: false);
 var aiKey = builder.AddParameter("AIKey", secret: true);
 var aiUseIdentity = builder.AddParameter("AIUseAzureIdentity", secret: false);
 var allowUntrustedCertificates = builder.AddParameter("AllowUntrustedCertificates", secret: false);
+var evaluationResultsPath = builder.AddParameter("EvaluationResultsPath", secret: false);
+var reportsPath = builder.AddParameter("ReportsPath", secret: false);
 
 var ollama = builder.AddOllama("ollama")
     .WithDataVolume("ollama-data");
@@ -49,6 +51,8 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         .WithEnvironment("AIKey", aiKey)
         .WithEnvironment("AIUseIdentity", aiUseIdentity)
         .WithEnvironment("AllowUntrustedCertificates", allowUntrustedCertificates)
+        .WithEnvironment("EvaluationResultsPath", evaluationResultsPath)
+        .WithEnvironment("ReportsPath", reportsPath)
         .WithExplicitStart()
         .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "json")
         .OnMatched(async (e, ct) =>
