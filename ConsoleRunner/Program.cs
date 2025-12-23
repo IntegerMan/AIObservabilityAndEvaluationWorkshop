@@ -3,6 +3,7 @@ using System.Diagnostics;
 using AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
+using AIObservabilityAndEvaluationWorkshop.Definitions.Reporting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,6 +14,15 @@ builder.AddServiceDefaults();
 builder.Services.AddScoped<ExecuteLessonCommand>();
 
 builder.Services.AddConfiguredChatClient(builder.Configuration);
+
+if (builder.Configuration["ReportStorageType"]?.ToLowerInvariant() == "azure")
+{
+    builder.Services.AddScoped<IReportStorageStrategy, AzureReportStorageStrategy>();
+}
+else
+{
+    builder.Services.AddScoped<IReportStorageStrategy, DiskReportStorageStrategy>();
+}
 
 builder.Services.Scan(scan => scan
     .FromAssemblyOf<HelloWorkshop>()

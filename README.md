@@ -81,6 +81,37 @@ If you choose to use `appsettings.json`, update the following fields:
 
 Alternatively, if you have the Azure CLI installed and are logged in, you can set `AIUseAzureIdentity` to `"true"` and leave `AIKey` blank to use Managed Identity / Entra ID authentication.
 
+### Configuring Report Storage
+
+By default, evaluation reports are stored on your local disk in the `Reports` directory relative to the project root.
+
+- **To change the local reports path**: Update `ReportsPath` in `appsettings.json`.
+- **To change the local evaluation results path**: Update `EvaluationResultsPath` in `appsettings.json`.
+
+#### Azure Storage for Reporting (Optional)
+
+If you prefer, you can store reports in Azure Storage (Data Lake Gen2).
+
+1.  **Create a Storage Account**: In the Azure Portal, create a new Storage Account. Ensure that **Hierarchical namespace** is enabled (under the **Advanced** tab) to enable Data Lake Storage Gen2.
+2.  **Create a Container**: Navigate to **Containers** in your new storage account and create a new container (e.g., `reports`).
+3.  **Get the Endpoint**: Your endpoint will typically be `https://<your-storage-account-name>.dfs.core.windows.net/`.
+
+**To use Azure Storage**: 
+
+1. Set `ReportStorageType` to `"azure"`.
+2. Set `AzureStorageAccountEndpoint` to your Data Lake Gen2 endpoint.
+3. Set `AzureStorageContainer` to your container name.
+
+```json
+{
+  "Parameters": {
+    "ReportStorageType": "azure",
+    "AzureStorageAccountEndpoint": "https://your-account.dfs.core.windows.net/",
+    "AzureStorageContainer": "your-container"
+  }
+}
+```
+
 ### Troubleshooting
 
 Here are a few tricky issues you may encounter when running the workshop code.
