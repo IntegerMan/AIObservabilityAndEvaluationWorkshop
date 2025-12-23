@@ -47,13 +47,7 @@ public abstract class LessonBase
         {
             logger.LogError(ex, "Error executing lesson {DisplayName}", DisplayName);
             
-            return new ConsoleResult
-            {
-                Success = false,
-                ErrorMessage = ex.Message,
-                Input = message,
-                LessonId = DisplayName
-            };
+            throw;
         }
     }
 

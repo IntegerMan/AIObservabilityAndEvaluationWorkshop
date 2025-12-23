@@ -52,24 +52,7 @@ public class ReportGenerationLesson(
             null);
 
         // 4. Generate the report using the strategy
-        string fullPath;
-        try 
-        {
-            fullPath = await storageStrategy.WriteReportAsync(reportingConfig, runResult);
-        }
-        catch (UnauthorizedAccessException ex)
-        {
-            evaluationResult.Metrics.TryGetValue(FluencyEvaluator.FluencyMetricName, out var fluencyMetric);
-            double grade = (fluencyMetric as NumericMetric)?.Value ?? 0;
-
-            return $"""
-                   ### Evaluation Successful (Report Writing Failed)
-                   
-                   Fluency Grade: {grade} / 5
-                   
-                   *Note: The HTML report could not be written due to a permission error: {ex.Message}*
-                   """;
-        }
+        string fullPath = await storageStrategy.WriteReportAsync(reportingConfig, runResult);
 
         evaluationResult.Metrics.TryGetValue(FluencyEvaluator.FluencyMetricName, out var finalMetric);
         double finalGrade = (finalMetric as NumericMetric)?.Value ?? 0;

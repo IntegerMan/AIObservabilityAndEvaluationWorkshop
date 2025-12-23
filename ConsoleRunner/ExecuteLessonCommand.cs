@@ -35,7 +35,25 @@ public class ExecuteLessonCommand(IServiceProvider serviceProvider, ILogger<Exec
             return;
         }
 
-        ConsoleResult result = await lesson.ExecuteAsync(message, serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(lesson.GetType()));
+        ConsoleResult result;
+        try 
+        {
+            result = await lesson.ExecuteAsync(message, serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(lesson.GetType()));
+        }
+        catch (Exception ex)
+        {
+            // Log the console error using the helper
+            AspireService errorAspireService = new(_activitySource, logger, message);
+            errorAspireService.LogError(
+                ex.Message,
+                lessonDisplayName,
+                ("message", message),
+                ("lesson.display_name", lessonDisplayName),
+                ("command.name", "execute-lesson")
+            );
+            
+            throw;
+        }
 
         // Log the console result using the helper
         AspireService resultAspireService = new(_activitySource, logger, message);
