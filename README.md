@@ -39,8 +39,8 @@ While this workshop can be run using local models via Ollama, using advanced clo
 
 4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We recommend using **gpt-5.2-chat** (or the latest available GPT-4o variant if gpt-5.2 is not yet available) and keeping the default deployment name.
 
-   ![Create Project](AzCreateProject.png)
-   ![Build in Foundry](AzFoundryBuild.png)
+   ![Create Project](Images/AzCreateProject.png)
+   ![Build in Foundry](Images/AzFoundryBuild.png)
 
 #### Configuring the Application
 
