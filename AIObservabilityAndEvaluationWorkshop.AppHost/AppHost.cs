@@ -20,7 +20,7 @@ var allowUntrustedCertificates = builder.AddParameter("AllowUntrustedCertificate
 var evaluationResultsPath = builder.AddParameter("EvaluationResultsPath", secret: false);
 var reportsPath = builder.AddParameter("ReportsPath", secret: false);
 var reportStorageType = builder.AddParameter("ReportStorageType", secret: false);
-var azureStorageAccountEndpoint = builder.AddParameter("AzureStorageAccountEndpoint", secret: false);
+var azureStorageConnectionString = builder.AddParameter("AzureStorageConnectionString", secret: true);
 var azureStorageContainer = builder.AddParameter("AzureStorageContainer", secret: false);
 
 var ollama = builder.AddOllama("ollama")
@@ -57,7 +57,7 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         .WithEnvironment("EvaluationResultsPath", evaluationResultsPath)
         .WithEnvironment("ReportsPath", reportsPath)
         .WithEnvironment("ReportStorageType", reportStorageType)
-        .WithEnvironment("AzureStorageAccountEndpoint", azureStorageAccountEndpoint)
+        .WithEnvironment("AzureStorageConnectionString", azureStorageConnectionString)
         .WithEnvironment("AzureStorageContainer", azureStorageContainer)
         .WithExplicitStart()
         .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "json")

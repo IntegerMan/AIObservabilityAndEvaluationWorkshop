@@ -93,8 +93,15 @@ By default, evaluation reports are stored on your local disk in the `Reports` di
 If you prefer, you can store reports in Azure Storage (Data Lake Gen2).
 
 1.  **Create a Storage Account**: In the Azure Portal, create a new Storage Account. Ensure that **Hierarchical namespace** is enabled (under the **Advanced** tab) to enable Data Lake Storage Gen2.
-2.  **Create a Container**: Navigate to **Containers** in your new storage account and create a new container (e.g., `reports`).
-3.  **Get the Endpoint**: Your endpoint will typically be `https://<your-storage-account-name>.dfs.core.windows.net/`.
+
+![Storage Creation](Images/StorageCreation.png)
+![Storage Creation - Advanced Settings](Images/StorageCreationAdvanced.png)
+
+2. **Create a Container**: Navigate to **Containers** in your new storage account and create a new container (e.g., `reports`). 
+
+![Container Creation](Images/CreateStorageContainer.png)
+
+4. **Get the Endpoint**: Your endpoint will typically be `https://<your-storage-account-name>.dfs.core.windows.net/`.
 
 **To use Azure Storage**: 
 
