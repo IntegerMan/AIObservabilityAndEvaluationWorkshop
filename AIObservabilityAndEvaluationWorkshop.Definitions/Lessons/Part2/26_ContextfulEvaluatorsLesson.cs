@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 5, "Contextful evaluators", needsInput: true)]
+[Lesson(2, 26, "Contextful evaluators", needsInput: true)]
 public class ContextfulEvaluatorsLesson : LessonBase
 {
     protected override Task<string> RunAsync(string message)
@@ -11,3 +11,4 @@ public class ContextfulEvaluatorsLesson : LessonBase
         return Task.FromResult($"Contextful evaluators placeholder. Input: {message}");
     }
 }
+

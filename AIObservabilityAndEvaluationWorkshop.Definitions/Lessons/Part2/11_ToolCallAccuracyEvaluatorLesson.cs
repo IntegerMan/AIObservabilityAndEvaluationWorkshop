@@ -1,3 +1,4 @@
+#pragma warning disable AIEVAL001 // Experimental evaluator
 using JetBrains.Annotations;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Evaluation;
@@ -7,12 +8,12 @@ using Microsoft.Extensions.Logging;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 1, "Fluency Evaluator", needsInput: true)]
-public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
+[Lesson(2, 11, "Tool Call Accuracy Evaluator", needsInput: true)]
+public class ToolCallAccuracyEvaluatorLesson(IChatClient chatClient, ILogger<ToolCallAccuracyEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
     protected override async Task<EvaluationResult> EvaluateAsync(string message)
     {
-        FluencyEvaluator evaluator = new();
+        ToolCallAccuracyEvaluator evaluator = new();
         
         EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
             message,
@@ -21,3 +22,4 @@ public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvalu
         return evaluationResult;
     }
 }
+

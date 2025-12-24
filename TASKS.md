@@ -33,34 +33,34 @@ This file contains tasks left for constructing the workshop.
 - [ ] CompositeEvaluator
 - [ ] Unit Testing with Evaluators
 
-#### Quality
+### Quality
 
-- [ ] RelevanceEvaluator
-- [ ] CompletenessEvaluator
-- [ ] RetrievalEvaluator
+- [x] RelevanceEvaluator
+- [x] CompletenessEvaluator
+- [x] RetrievalEvaluator
 - [x] FluencyEvaluator
 - [x] CoherenceEvaluator
-- [ ] EquivalenceEvaluator
-- [ ] GroundednessEvaluator
-- [ ] RelevanceTruthAndCompletenessEvaluator
-- [ ] IntentResolutionEvaluator
-- [ ] TaskAdherenceEvaluator
-- [ ] ToolCallAccuracyEvaluator
+- [x] EquivalenceEvaluator
+- [x] GroundednessEvaluator
+- [x] RelevanceTruthAndCompletenessEvaluator
+- [x] IntentResolutionEvaluator
+- [x] TaskAdherenceEvaluator
+- [x] ToolCallAccuracyEvaluator
 
-#### NLP
+### NLP
 
-- [ ] BLEUEvaluator
-- [ ] GLEUEvaluator
-- [ ] F1Evaluator
+- [x] BLEUEvaluator
+- [x] GLEUEvaluator
+- [x] F1Evaluator
 
-#### Safety
+### Safety
 
-- [ ] GroundednessProEvaluator
-- [ ] ProtectedMaterialEvaluator
-- [ ] UngroundedAttributesEvaluator
-- [ ] HateAndUnfairnessEvaluator
-- [ ] SelfHarmEvaluator
-- [ ] ViolenceEvaluator
-- [ ] SexualEvaluator
-- [ ] CodeVulnerabilityEvaluator
-- [ ] IndirectAttackEvaluator
+- [x] GroundednessProEvaluator
+- [x] ProtectedMaterialEvaluator
+- [x] UngroundedAttributesEvaluator
+- [x] HateAndUnfairnessEvaluator
+- [x] SelfHarmEvaluator
+- [x] ViolenceEvaluator
+- [x] SexualEvaluator
+- [x] CodeVulnerabilityEvaluator
+- [x] IndirectAttackEvaluator

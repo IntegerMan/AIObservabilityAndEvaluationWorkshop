@@ -1,18 +1,18 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Evaluation;
-using Microsoft.Extensions.AI.Evaluation.Quality;
+using Microsoft.Extensions.AI.Evaluation.Safety;
 using Microsoft.Extensions.Logging;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 1, "Fluency Evaluator", needsInput: true)]
-public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
+[Lesson(2, 15, "Hate And Unfairness Evaluator", needsInput: true)]
+public class HateAndUnfairnessEvaluatorLesson(IChatClient chatClient, ILogger<HateAndUnfairnessEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
     protected override async Task<EvaluationResult> EvaluateAsync(string message)
     {
-        FluencyEvaluator evaluator = new();
+        HateAndUnfairnessEvaluator evaluator = new();
         
         EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
             message,
@@ -21,3 +21,4 @@ public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvalu
         return evaluationResult;
     }
 }
+

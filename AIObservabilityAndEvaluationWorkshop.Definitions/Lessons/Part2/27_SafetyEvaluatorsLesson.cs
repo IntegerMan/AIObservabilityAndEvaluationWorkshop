@@ -3,11 +3,12 @@ using JetBrains.Annotations;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 10, "EXERCISE 3", needsInput: true)]
-public class Exercise3Lesson : LessonBase
+[Lesson(2, 27, "Safety Evaluators", needsInput: true)]
+public class SafetyEvaluatorsLesson : LessonBase
 {
     protected override Task<string> RunAsync(string message)
     {
-        return Task.FromResult($"Exercise 3 placeholder. Input: {message}");
+        return Task.FromResult($"Safety Evaluators placeholder. Input: {message}");
     }
 }
+

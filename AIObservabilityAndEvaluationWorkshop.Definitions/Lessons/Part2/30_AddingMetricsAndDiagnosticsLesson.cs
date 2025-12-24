@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 9, "Adding Metrics and Diagnostics", needsInput: true)]
+[Lesson(2, 30, "Adding Metrics and Diagnostics", needsInput: true)]
 public class AddingMetricsAndDiagnosticsLesson : LessonBase
 {
     protected override Task<string> RunAsync(string message)
@@ -11,3 +11,4 @@ public class AddingMetricsAndDiagnosticsLesson : LessonBase
         return Task.FromResult($"Adding Metrics and Diagnostics placeholder. Input: {message}");
     }
 }
+

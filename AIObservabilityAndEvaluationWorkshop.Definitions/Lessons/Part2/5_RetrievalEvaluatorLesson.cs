@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(2, 1, "Fluency Evaluator", needsInput: true)]
-public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
+[Lesson(2, 5, "Retrieval Evaluator", needsInput: true)]
+public class RetrievalEvaluatorLesson(IChatClient chatClient, ILogger<RetrievalEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
     protected override async Task<EvaluationResult> EvaluateAsync(string message)
     {
-        FluencyEvaluator evaluator = new();
+        RetrievalEvaluator evaluator = new();
         
         EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
             message,
@@ -21,3 +21,4 @@ public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvalu
         return evaluationResult;
     }
 }
+
