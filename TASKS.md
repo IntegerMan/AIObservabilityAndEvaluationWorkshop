@@ -11,7 +11,7 @@ This file contains tasks left for constructing the workshop.
 - [ ] Exercise 2 Details
 - [ ] Exercise 3 Details
 - [ ] Exercise 4 Details
-- [ ] Setup Azure resources on Legion Go
+- [x] Setup Azure resources on Legion Go
 - [ ] Setup OpenAI resources on Legion Go
 - [ ] Verify works with OpenAI
 
@@ -37,32 +37,32 @@ This file contains tasks left for constructing the workshop.
 
 ### Quality
 
-- [x] RelevanceEvaluator
+- [/] RelevanceEvaluator
 - [x] CompletenessEvaluator
-- [x] RetrievalEvaluator
+- [/] RetrievalEvaluator
 - [x] FluencyEvaluator
-- [x] CoherenceEvaluator
-- [x] EquivalenceEvaluator
-- [x] GroundednessEvaluator
-- [x] RelevanceTruthAndCompletenessEvaluator
-- [x] IntentResolutionEvaluator
-- [x] TaskAdherenceEvaluator
-- [x] ToolCallAccuracyEvaluator
+- [/] CoherenceEvaluator
+- [/] EquivalenceEvaluator
+- [/] GroundednessEvaluator
+- [/] RelevanceTruthAndCompletenessEvaluator
+- [/] IntentResolutionEvaluator
+- [/] TaskAdherenceEvaluator
+- [/] ToolCallAccuracyEvaluator
 
 ### NLP
 
-- [x] BLEUEvaluator
-- [x] GLEUEvaluator
-- [x] F1Evaluator
+- [/] BLEUEvaluator
+- [/] GLEUEvaluator
+- [/] F1Evaluator
 
 ### Safety
 
-- [x] GroundednessProEvaluator
-- [x] ProtectedMaterialEvaluator
-- [x] UngroundedAttributesEvaluator
-- [x] HateAndUnfairnessEvaluator
-- [x] SelfHarmEvaluator
-- [x] ViolenceEvaluator
-- [x] SexualEvaluator
-- [x] CodeVulnerabilityEvaluator
-- [x] IndirectAttackEvaluator
+- [/] GroundednessProEvaluator
+- [/] ProtectedMaterialEvaluator
+- [/] UngroundedAttributesEvaluator
+- [/] HateAndUnfairnessEvaluator
+- [/] SelfHarmEvaluator
+- [/] ViolenceEvaluator
+- [/] SexualEvaluator
+- [/] CodeVulnerabilityEvaluator
+- [/] IndirectAttackEvaluator

@@ -213,11 +213,11 @@ consoleAppBuilder.WithCommand("start-with-input", "Start with Input", async cont
             string inputMessage = selectedLesson.InputPromptMessage ?? "Please enter your message:";
             
             InteractionResult<InteractionInput> messageResult = await interactionService.PromptInputAsync(
-                title: inputTitle,
+                title: "Provide Input",
                 message: inputMessage,
                 input: new InteractionInput
                 {
-                    Name = "UserMessage",
+                    Name = inputTitle,
                     InputType = InputType.Text,
                     Required = true,
                     Placeholder = "Enter your message here"
