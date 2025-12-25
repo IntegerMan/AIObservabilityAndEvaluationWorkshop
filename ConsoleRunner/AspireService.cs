@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using Microsoft.Extensions.Logging;
@@ -39,10 +40,31 @@ public class AspireService(ActivitySource activitySource, ILogger logger, string
             activity?.SetStatus(ActivityStatusCode.Error, result.ErrorMessage);
         }
         
-        // Serialize and output the result in a standardized format for AppHost to capture
-        // Use single-line JSON for console output (regex capture works better with single-line)
+        // Serialize the result
         string json = JsonSerializer.Serialize(result);
-        Console.WriteLine($"CONSOLE_RESULT: {json}");
+        
+        // Write to a temporary file to avoid console buffer truncation issues
+        // Then output a short trigger string that the watcher can capture
+        string tempFile = Path.GetTempFileName();
+        string outputFile = Path.ChangeExtension(tempFile, ".json");
+        
+        try
+        {
+            // Delete the temp file created by GetTempFileName and create our .json file
+            File.Delete(tempFile);
+            File.WriteAllText(outputFile, json);
+            logger.LogDebug("Wrote console result to file: {OutputFile}", outputFile);
+            
+            // Output a short trigger string (< 240 chars) that the watcher can capture
+            // The file path should be well under 240 characters
+            Console.WriteLine($"CONSOLE_RESULT_FILE: {outputFile}");
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to write console result to file: {OutputFile}", outputFile);
+            // Fall back to console output (may be truncated for large outputs)
+            Console.WriteLine($"CONSOLE_RESULT: {json}");
+        }
 
         // Log indented version for readability
         logger.LogInformation("Console result output: {Json}", JsonSerializer.Serialize(result, _jsonSerializerOptions));

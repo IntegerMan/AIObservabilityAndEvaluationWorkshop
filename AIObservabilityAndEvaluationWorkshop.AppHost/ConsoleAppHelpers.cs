@@ -4,7 +4,7 @@ namespace AIObservabilityAndEvaluationWorkshop.AppHost;
 
 public partial class ConsoleAppHelpers
 {
-    [GeneratedRegex(@"^CONSOLE_RESULT:\s*(?<json>.*)$", RegexOptions.Multiline)]
+    [GeneratedRegex(@"^CONSOLE_RESULT_FILE:\s*(?<filepath>.+)$", RegexOptions.Multiline)]
     public static partial Regex GetConsoleResultRegex();
 
 }

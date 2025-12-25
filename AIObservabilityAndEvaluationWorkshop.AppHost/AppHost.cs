@@ -1,5 +1,6 @@
 #pragma warning disable ASPIREINTERACTION001 // Interaction Service is for evaluation purposes only
 
+using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.AppHost;
@@ -59,21 +60,90 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
         .WithEnvironment("AzureStorageConnectionString", azureStorageConnectionString)
         .WithEnvironment("AzureStorageContainer", azureStorageContainer)
         .WithExplicitStart()
-        .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "json")
+        .WithOutputWatcher(ConsoleAppHelpers.GetConsoleResultRegex(), isSecret: false, "filepath")
         .OnMatched(async (e, ct) =>
         {
             Console.WriteLine($"AppHost: OnMatched event fired for {e.Resource.Name}: {e.Key}, {e.Message}");
 
-            // Get the captured JSON from the regex match
-            if (e.Properties.TryGetValue("json", out object? jsonValue))
+            // Get the captured file path from the regex match
+            if (e.Properties.TryGetValue("filepath", out object? filePathValue))
             {
-                string json = jsonValue.ToString()!;
-                Console.WriteLine($"AppHost: Captured JSON: {json}");
+                string filePath = filePathValue.ToString()!;
+                Console.WriteLine($"AppHost: Captured file path: {filePath}");
+
+                string? json = null;
+                int retryCount = 0;
+                const int maxRetries = 10;
+                const int retryDelayMs = 100;
+
+                // Poll for file creation and handle file locking gracefully
+                while (retryCount < maxRetries && json == null)
+                {
+                    try
+                    {
+                        if (File.Exists(filePath))
+                        {
+                            // Wait additional 200ms after detecting file to ensure write completion
+                            await Task.Delay(200, ct);
+                            
+                            // Try to read the file with retry for file locking
+                            for (int i = 0; i < 5; i++)
+                            {
+                                try
+                                {
+                                    json = await File.ReadAllTextAsync(filePath, ct);
+                                    break;
+                                }
+                                catch (IOException) when (i < 4)
+                                {
+                                    // File might be locked, wait and retry
+                                    await Task.Delay(50, ct);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // File doesn't exist yet, wait and retry
+                            await Task.Delay(retryDelayMs, ct);
+                            retryCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"AppHost: Error reading file (attempt {retryCount + 1}): {ex.Message}");
+                        if (retryCount >= maxRetries - 1)
+                        {
+                            Console.WriteLine($"AppHost: Failed to read file after {maxRetries} attempts");
+                            return;
+                        }
+                        await Task.Delay(retryDelayMs, ct);
+                        retryCount++;
+                    }
+                }
+
+                if (json == null)
+                {
+                    Console.WriteLine($"AppHost: Failed to read JSON from file: {filePath}");
+                    return;
+                }
+
+                Console.WriteLine($"AppHost: Read JSON from file, length: {json.Length} characters");
 
                 try
                 {
                     // Deserialize the JSON result
                     ConsoleResult? result = JsonSerializer.Deserialize<ConsoleResult>(json);
+                    
+                    // Clean up the temporary file
+                    try
+                    {
+                        File.Delete(filePath);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"AppHost: Warning - Failed to delete temp file: {ex.Message}");
+                    }
+
                     if (result != null)
                     {
                         // Get interaction service to show notification
@@ -134,11 +204,13 @@ IResourceBuilder<ProjectResource> consoleAppBuilder =
                 catch (JsonException ex)
                 {
                     Console.WriteLine($"AppHost: JSON deserialization failed: {ex.Message}");
+                    Console.WriteLine($"AppHost: JSON length was: {json.Length} characters");
+                    Console.WriteLine($"AppHost: JSON ends with: {json.Substring(Math.Max(0, json.Length - 100))}");
                 }
             }
             else
             {
-                Console.WriteLine("AppHost: No JSON captured from regex match");
+                Console.WriteLine("AppHost: No file path captured from regex match");
             }
         })
         .WithArgs(context =>
