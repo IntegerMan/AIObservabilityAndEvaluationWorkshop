@@ -18,7 +18,9 @@ We recommend launching the application in advance with a stable internet connect
 
 ### Azure Cloud Resources (Optional)
 
-While this workshop can be run using local models via Ollama, using advanced cloud-based models will provide more accurate evaluations and better overall performance. We recommend setting up an Azure OpenAI resource if you have access to one.
+Aside from the Azure Content Safety portion, all workshop contents can be run using local models via Ollama, using advanced cloud-based models will provide more accurate evaluations and better overall performance.
+
+We recommend setting up an Azure OpenAI resource if you have access to one and setting up identity authentication to make things easier for you and to enable safety evaluators.
 
 > [!NOTE]
 > Azure resources may have an associated cost, including per-use costs with the base model LLMs. Monitor your usage and set up budget alerts if necessary.
@@ -37,14 +39,79 @@ While this workshop can be run using local models via Ollama, using advanced clo
 
    ![Keys and Endpoints](Images/AzKeysAndEndpoints.png)
 
-4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We recommend using **gpt-5.2-chat** (or the latest available GPT-4o variant if gpt-5.2 is not yet available) and keeping the default deployment name.
+4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We recommend using **gpt-4o**, which MEAI Evaluation recommends as a tested library, and keeping the default deployment name.
 
    ![Create Project](Images/AzCreateProject.png)
    ![Build in Foundry](Images/AzFoundryBuild.png)
 
+#### Setting up identity authentication
+
+If you plan on using identity authentication, your user will need to have the **Cognitive Services OpenAI User** role on your Azure OpenAI resource.
+
+You can do this by going to the resource in the Azure Portal, selecting **Access control (IAM)** on the sidebar, and then clicking **Add role assignment**.
+
+Next, search for **Cognitive Services OpenAI User**, select it, and click Next.
+
+![Adding Cognitive Services OpenAI User role permissions](Images/AddRoleAssignment.png)
+
+Now select your user and click the various buttons to review and accept the role assignment.
+![Assigning the role to your user](Images/AddRoleAssignmentToUser.png)
+
+#### Logging in for Identity Authentication
+
+In order to set up identity authentication with Azure, you'll need to install [Azure PowerShell](https://learn.microsoft.com/en-us/powershell/azure/install-azure-powershell).
+
+Next, you'll need to find your tenant ID in the Azure portal by going to the Microsoft Entra ID resource and finding the Tenant ID there.
+
+![Microsoft Entra ID](Images/MicrosoftEntraId.png)
+
+After this, do an `az login --tenant YourTenantId` to log in.
+
+Log in following the dialog box that opens and select your Azure subscription. You are now logged in.
+
+See the **Troubleshooting** section later on for additional materials.
+
 #### Configuring the Application
 
 To use your Azure OpenAI deployment, update the `AIObservabilityAndEvaluationWorkshop.AppHost/appsettings.json` file.
+
+Here's a sample config section indicating Azure Identity authentication:
+
+```json
+  "Parameters": {
+    "EnableSensitiveDataLogging": "true",
+    "AIProvider": "Azure",
+    "AIModel": "gpt-4o",
+    "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
+    "AIKey": "",
+    "AIUseAzureIdentity": "true",
+    "AllowUntrustedCertificates": "false",
+    "EvaluationResultsPath": "../EvaluationResults",
+    "ReportsPath": "../Reports",
+    "ReportStorageType": "disk",
+    "AzureStorageConnectionString": "",
+    "AzureStorageContainer": ""
+  }
+```
+
+Here's an alternative that uses the simpler key-based authentication (Note: content safety evaluators will fail)
+
+```json
+  "Parameters": {
+    "EnableSensitiveDataLogging": "true",
+    "AIProvider": "Azure",
+    "AIModel": "gpt-4o",
+    "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
+    "AIKey": "MyApiKey",
+    "AIUseAzureIdentity": "true",
+    "AllowUntrustedCertificates": "false",
+    "EvaluationResultsPath": "../EvaluationResults",
+    "ReportsPath": "../Reports",
+    "ReportStorageType": "disk",
+    "AzureStorageConnectionString": "",
+    "AzureStorageContainer": ""
+  }
+```
 
 > [!WARNING]
 > Your `AIKey` is sensitive information. **Never commit your API key to version control.**
@@ -124,6 +191,12 @@ If you prefer, you can store reports in Azure Storage (Data Lake Gen2).
 ### Troubleshooting
 
 Here are a few tricky issues you may encounter when running the workshop code.
+
+#### Identity Authentication on Azure
+
+If you want to use Azure models with identity authentication (required for the content safety evaluators to succeed), you must authenticate using identity authentication.
+
+Microsoft provides a helpful guide to common errors here: [Troubleshooting Azure Identity](https://aka.ms/azsdk/net/identity/defaultazurecredential/troubleshoot )
 
 #### Inotify Limit Error on Linux
 

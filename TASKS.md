@@ -4,14 +4,13 @@ This file contains tasks left for constructing the workshop.
 
 - [x] Add an optional pre-run message box with info / context.
 - [x] Allow customizing the message prompt
-- [ ] Add any necessary slides
-- [ ] Finalize setup instructions (Due 12/27/25)
+- [/] Finalize setup instructions (Due 12/27/25)
 - [ ] Review all code
 - [ ] Exercise 1 Details
 - [ ] Exercise 2 Details
 - [ ] Exercise 3 Details
 - [ ] Exercise 4 Details
-- [ ] Azure Identity Authentication
+- [x] Azure Identity Authentication
 - [x] Setup Azure resources on Legion Go
 - [ ] Setup OpenAI resources on Legion Go (Due 12/27/25)
 - [ ] Verify works with OpenAI (Due 12/27/25)

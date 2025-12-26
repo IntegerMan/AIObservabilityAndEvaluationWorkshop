@@ -112,8 +112,7 @@ public static class ChatClientExtensions
         {
             azureOptions.Transport = new HttpClientPipelineTransport(new HttpClient(new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback =
-                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             }));
         }
 
@@ -121,7 +120,8 @@ public static class ChatClientExtensions
 
         if (useIdentity)
         {
-            client = new AzureOpenAIClient(uri, new DefaultAzureCredential(), azureOptions).GetChatClient(modelName)
+            // NOTE: This is not acceptable for production, but helps dodge issues with cached credentials. You'll need to use AZ LOGIN to provide this credential
+            client = new AzureOpenAIClient(uri, new AzureCliCredential(), azureOptions).GetChatClient(modelName)
                 .AsIChatClient();
         }
         else if (!string.IsNullOrEmpty(key))
