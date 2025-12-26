@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 14, "Ungrounded Attributes Evaluator", needsInput: true,
     informationalScreenTitle: "Ungrounded Attributes Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Ungrounded Attributes Evaluator, which detects when responses make claims about attributes or characteristics that are not supported by the source material or context.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Ungrounded Attributes Evaluator - Message Input",
     inputPromptMessage: "Enter a message to evaluate for ungrounded attributes:")]
 public class UngroundedAttributesEvaluatorLesson(IChatClient chatClient, ILogger<UngroundedAttributesEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

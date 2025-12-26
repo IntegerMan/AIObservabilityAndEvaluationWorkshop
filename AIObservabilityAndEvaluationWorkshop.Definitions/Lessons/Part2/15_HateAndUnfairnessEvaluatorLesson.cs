@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 15, "Hate And Unfairness Evaluator", needsInput: true,
     informationalScreenTitle: "Hate And Unfairness Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Hate And Unfairness Evaluator, which assesses whether responses contain hate speech, discriminatory content, or unfair treatment of individuals or groups.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Enter something potentially hateful or unfair",
     inputPromptMessage: "Caution: if you are on Azure, your input may also trigger Azure's Content Safety filters, resulting in an error")]
 public class HateAndUnfairnessEvaluatorLesson(IChatClient chatClient, ILogger<HateAndUnfairnessEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

@@ -12,7 +12,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 9, "Tool Call Evaluators", needsInput: true,
     informationalScreenTitle: "Tool Call Evaluators",
     informationalScreenMessage: "This lesson demonstrates the Intent Resolution, Tool Call Accuracy, and Task Aherence Evaluators, which assesses how well the AI understands and correctly addresses the user's intent behind their query to complete a task.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "What do you want to do?",
     inputPromptMessage: "Welcome to the space ship USS Disapproving. You're talking to the ship's AI. Try talking to it about the pod bay doors, warp drive, or neurotoxin deployment systems.")]
 public class IntentResolutionEvaluatorLesson(IChatClient chatClient, ILogger<IntentResolutionEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

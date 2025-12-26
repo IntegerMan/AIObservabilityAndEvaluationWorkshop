@@ -6,7 +6,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(1, 9, "EXERCISE 1", needsInput: true,
     informationalScreenTitle: "Exercise 1",
     informationalScreenMessage: "This is an exercise lesson. Apply what you've learned in the previous lessons to complete this exercise.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Exercise 1 - Input",
     inputPromptMessage: "Enter your input for Exercise 1:")]
 public class Exercise1Lesson : LessonBase

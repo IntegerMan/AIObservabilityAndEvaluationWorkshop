@@ -6,7 +6,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(3, 5, "Custom report storage", needsInput: true,
     informationalScreenTitle: "Custom Report Storage",
     informationalScreenMessage: "This lesson demonstrates how to implement custom report storage strategies, allowing you to save evaluation reports to custom locations or systems beyond the default file system.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Custom Report Storage - Message Input",
     inputPromptMessage: "Enter a message to generate a report with custom storage:")]
 public class CustomReportStorageLesson : LessonBase

@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 1, "Fluency Evaluator", needsInput: true,
     informationalScreenTitle: "Fluency Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Fluency Evaluator, which assesses how natural and fluent the AI's response sounds. The evaluator checks for grammatical correctness, natural language flow, and overall readability.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Fluency Evaluator - Message Input",
     inputPromptMessage: "Enter a message to evaluate for fluency:")]
 public class FluencyEvaluatorLesson(IChatClient chatClient, ILogger<FluencyEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

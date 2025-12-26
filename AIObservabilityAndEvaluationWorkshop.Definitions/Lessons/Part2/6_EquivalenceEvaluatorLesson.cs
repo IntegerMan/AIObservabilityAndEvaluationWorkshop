@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 6, "Equivalence Evaluator", needsInput: true,
     informationalScreenTitle: "Equivalence Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Equivalence Evaluator, which compares generated text to ground truth to assess semantic equivalence. It checks if the response conveys the same meaning as the expected answer.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Answer the question in the form of a sentence.",
     inputPromptMessage: "What do people call the gorilla that watches over CodeMash and the Kalahari?")]
 public class EquivalenceEvaluatorLesson(IChatClient chatClient, ILogger<EquivalenceEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

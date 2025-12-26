@@ -16,6 +16,7 @@ This file contains tasks left for constructing the workshop.
 - [ ] Verify works with OpenAI (Due 12/27/25)
 - [ ] Intro Slide
 - [ ] Feedback Slide
+- [ ] Investigate / report safety evaluator errors
 
 ## Chat
 
@@ -59,15 +60,15 @@ This file contains tasks left for constructing the workshop.
 
 ### Safety
 
-- [x] GroundednessProEvaluator
-- [!] ProtectedMaterialEvaluator
+- [!] GroundednessProEvaluator
 - [/] UngroundedAttributesEvaluator
-- [!] HateAndUnfairnessEvaluator
-- [/] SelfHarmEvaluator
-- [!] ContentHarmEvaluator
-- [/] ViolenceEvaluator
-- [/] SexualEvaluator
 - [/] CodeVulnerabilityEvaluator
 - [/] IndirectAttackEvaluator
+- [!] ProtectedMaterialEvaluator
+- [!] HateAndUnfairnessEvaluator
+- [!] SelfHarmEvaluator
+- [!] ContentHarmEvaluator
+- [!] ViolenceEvaluator
+- [!] SexualEvaluator
 
 - [ ] Custom Evaluator: BrevityEvaluator

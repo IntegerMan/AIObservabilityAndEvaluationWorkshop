@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 21, "NLP Evaluators", needsInput: true,
     informationalScreenTitle: "NLP Evaluators",
     informationalScreenMessage: "This lesson demonstrates the F1, BLEU (Bilingual Evaluation Understudy) and GLEU (Google's BLEU) Evaluators, which measure the similarity between generated text and reference text using n-gram precision. These are commonly used for machine translation evaluation.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Please translate this from English to French",
     inputPromptMessage: "Message to translate: 'Hello, I am a computer.'")]
 public class NlpEvaluatorsLesson(ILogger<NlpEvaluatorsLesson> logger) : EvaluatorLessonBase(logger)

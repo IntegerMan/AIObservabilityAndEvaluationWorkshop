@@ -11,7 +11,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 8, "Relevance Truth And Completeness Evaluator", needsInput: true,
     informationalScreenTitle: "Relevance Truth And Completeness Evaluator",
     informationalScreenMessage: "This lesson demonstrates a composite evaluator that assesses relevance, truthfulness, and completeness together. It provides a comprehensive evaluation of response quality across multiple dimensions.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Enter an answer to judge its relevance, truth, and completeness",
     inputPromptMessage: "I'm thinking about being an astronaut when I grow up. Tell me something interesting about the moon.")]
 public class RelevanceTruthAndCompletenessEvaluatorLesson(IChatClient chatClient, ILogger<RelevanceTruthAndCompletenessEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

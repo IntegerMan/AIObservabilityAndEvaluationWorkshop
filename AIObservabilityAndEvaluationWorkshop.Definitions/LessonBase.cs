@@ -24,9 +24,6 @@ public abstract class LessonBase
     public virtual string? InformationalScreenMessage => 
         GetType().GetCustomAttribute<LessonAttribute>()?.InformationalScreenMessage;
 
-    public virtual bool InformationalScreenSupportsMarkdown => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.InformationalScreenSupportsMarkdown ?? false;
-
     private readonly ActivitySource _activitySource;
 
     protected LessonBase()

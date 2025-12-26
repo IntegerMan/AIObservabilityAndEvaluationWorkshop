@@ -12,7 +12,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(3, 1, "Report Generation", needsInput: true,
     informationalScreenTitle: "Report Generation",
     informationalScreenMessage: "This lesson demonstrates how to generate evaluation reports. The system will evaluate your input using a Fluency Evaluator and generate an HTML report that you can view in your browser.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Report Generation - Message Input",
     inputPromptMessage: "Enter a message to evaluate and generate a report for:")]
 public class ReportGenerationLesson(

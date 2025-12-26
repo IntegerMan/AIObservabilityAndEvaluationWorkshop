@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 5, "Retrieval Evaluator", needsInput: true,
     informationalScreenTitle: "Retrieval Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Retrieval Evaluator, which assesses how well the AI retrieves and uses relevant information from context or knowledge bases to answer the query.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "When and where does CodeMash take place?",
     inputPromptMessage: "Enter a message to evaluate for retrieval quality:")]
 public class RetrievalEvaluatorLesson(IChatClient chatClient, ILogger<RetrievalEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

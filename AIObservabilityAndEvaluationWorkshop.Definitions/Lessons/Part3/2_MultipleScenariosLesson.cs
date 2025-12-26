@@ -6,7 +6,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(3, 2, "Multiple Scenarios", needsInput: true,
     informationalScreenTitle: "Multiple Scenarios",
     informationalScreenMessage: "This lesson demonstrates how to run evaluations across multiple scenarios, allowing you to test your AI system with different inputs and compare results.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Multiple Scenarios - Message Input",
     inputPromptMessage: "Enter a message for the multiple scenarios evaluation:")]
 public class MultipleScenariosLesson : LessonBase

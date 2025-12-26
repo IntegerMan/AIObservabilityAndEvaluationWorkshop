@@ -10,7 +10,6 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 [Lesson(2, 2, "Completeness Evaluator", needsInput: true,
     informationalScreenTitle: "Completeness Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Completeness Evaluator, which assesses whether the AI's response fully addresses the user's question or request. It checks if all aspects of the query are covered.",
-    informationalScreenSupportsMarkdown: false,
     inputPromptTitle: "Your answer (hint: it doesn't)",
     inputPromptMessage: "Answer the question regarding a fictitious hat: Does this hat allow me to move objects with my mind?")]
 public class CompletenessEvaluatorLesson(IChatClient chatClient, ILogger<CompletenessEvaluatorLesson> logger) : EvaluatorLessonBase(logger)

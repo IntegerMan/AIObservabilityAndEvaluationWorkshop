@@ -152,7 +152,7 @@ public class ConsoleAppInteractionHandler
                     options: new MessageBoxInteractionOptions
                     {
                         Intent = MessageIntent.Information,
-                        EnableMessageMarkdown = selectedLesson.InformationalScreenSupportsMarkdown,
+                        EnableMessageMarkdown = true,
                         PrimaryButtonText = "Continue"
                     },
                     cancellationToken: cancellationToken);
