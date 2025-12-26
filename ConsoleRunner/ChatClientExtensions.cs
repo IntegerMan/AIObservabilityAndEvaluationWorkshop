@@ -19,6 +19,7 @@ public static class ChatClientExtensions
         string aiProvider = configuration["AIProvider"] ?? "Ollama";
         bool useIdentity = configuration.GetValue("AIUseIdentity", false);
         string? endpoint = configuration["AIEndpoint"];
+        string? safetyEndpoint = configuration["AIContentSafetyEndpoint"];
 
         services.AddChatClient(_ =>
             {
@@ -47,9 +48,10 @@ public static class ChatClientExtensions
             });
         
         // We can only use Content Safety when on Azure Identity
-        if (aiProvider.ToLowerInvariant() == "azure" && useIdentity && !string.IsNullOrEmpty(endpoint))
+        if (aiProvider.ToLowerInvariant() == "azure" && useIdentity && !string.IsNullOrEmpty(safetyEndpoint))
         {
-            services.AddScoped<ContentSafetyServiceConfiguration>(_ => new(new DefaultAzureCredential(), new Uri(endpoint)));
+            // NOTE: For production you'd use the DefaultAzureCredential here, but this prevents caching issues for local development
+            services.AddScoped<ContentSafetyServiceConfiguration>(_ => new(new AzureCliCredential(), new Uri(safetyEndpoint)));
         }
 
         return services;
@@ -73,7 +75,6 @@ public static class ChatClientExtensions
     private static IChatClient ConfigureOpenAiClient(string? key, string? endpoint, bool allowUntrustedCertificates,
         string modelName)
     {
-        IChatClient client;
         if (string.IsNullOrEmpty(key))
         {
             throw new InvalidOperationException("OpenAI requires an API Key.");
@@ -94,8 +95,7 @@ public static class ChatClientExtensions
             }));
         }
 
-        client = new OpenAIClient(new ApiKeyCredential(key), openaiOptions).GetChatClient(modelName).AsIChatClient();
-        return client;
+        return new OpenAIClient(new ApiKeyCredential(key), openaiOptions).GetChatClient(modelName).AsIChatClient();
     }
 
     private static IChatClient ConfigureAzureClient(string? endpoint, bool allowUntrustedCertificates, bool useIdentity,

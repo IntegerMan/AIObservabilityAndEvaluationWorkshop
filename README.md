@@ -44,9 +44,31 @@ We recommend setting up an Azure OpenAI resource if you have access to one and s
    ![Create Project](Images/AzCreateProject.png)
    ![Build in Foundry](Images/AzFoundryBuild.png)
 
+#### Setting up Content Safety
+
+If you plan on using the content safety evaluators, you'll need to authenticate with identity authentication (see next section) and you'll need to have a content safety resource created and configured.
+
+You can find Content Safety in the Azure Portal by searching for Content Safety.
+
+![Content Safety Resource](Images/ContentSafetyResource.png)
+
+Next Click Create and specify your details. I recommend using the same resource group you used for Azure OpenAI. 
+
+**Important Note: This resource must be in one of [several limited regions](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/risk-safety-evaluators) at the moment. I recommend choosing `East US 2`**
+
+You should be fine with a `Free F0` resource tier.
+
+![Create Content Safety Resource](Images/CreateContentSafety.png)
+
+Once created, go to the Keys and Endpoints blade in the Resource Management group to find your endpoint. Since we'll be forced into Identity Authentication we won't need the keys.
+
+![Content Safety Endpoint](Images/ContentSafetyKeysAndEndpoints.png)
+
+You'll use this for the `AIContentSafetyEndpoint` optional configuration setting in `appsettings.json`
+
 #### Setting up identity authentication
 
-If you plan on using identity authentication, your user will need to have the **Cognitive Services OpenAI User** role on your Azure OpenAI resource.
+If you plan on using identity authentication, your user will need to have the **Cognitive Services OpenAI User** and **Cognitive Services User** roles on your Azure OpenAI resource.
 
 You can do this by going to the resource in the Azure Portal, selecting **Access control (IAM)** on the sidebar, and then clicking **Add role assignment**.
 
@@ -56,6 +78,8 @@ Next, search for **Cognitive Services OpenAI User**, select it, and click Next.
 
 Now select your user and click the various buttons to review and accept the role assignment.
 ![Assigning the role to your user](Images/AddRoleAssignmentToUser.png)
+
+Do this same process again for the **Cognitive Services User** role.
 
 #### Logging in for Identity Authentication
 
@@ -197,6 +221,12 @@ Here are a few tricky issues you may encounter when running the workshop code.
 If you want to use Azure models with identity authentication (required for the content safety evaluators to succeed), you must authenticate using identity authentication.
 
 Microsoft provides a helpful guide to common errors here: [Troubleshooting Azure Identity](https://aka.ms/azsdk/net/identity/defaultazurecredential/troubleshoot )
+
+#### AI Evaluation SDK Troubleshooting
+
+Microsoft has provided a helpful [troubleshooting guide](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/evaluation/azure-ai-evaluation/TROUBLESHOOTING.md) on their repository which can help with some issues and specific errors.
+
+This is particularly helpful for safety evaluator configuration issues.
 
 #### Inotify Limit Error on Linux
 
