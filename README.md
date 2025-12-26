@@ -198,3 +198,10 @@ sequenceDiagram
 ```
 
 For more details on the implementation, see `AIObservabilityAndEvaluationWorkshop.AppHost/AppHost.cs`.
+
+## Additional Resources
+
+See the following blog posts or other resources on related topics of interest on things in this workshop:
+
+- [An LLM Evaluation Framework for AI Systems Performance](https://blog.leadingedje.com/post/ai/evaluation.html) - blog post by [Matt Eland](https://MattEland.dev) on **MEAI Evaluation**
+- 

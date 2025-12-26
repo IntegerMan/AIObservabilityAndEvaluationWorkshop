@@ -44,7 +44,7 @@ This file contains tasks left for constructing the workshop.
 - [x] CoherenceEvaluator
 - [x] EquivalenceEvaluator
 - [x] GroundednessEvaluator
-- [/] RelevanceTruthAndCompletenessEvaluator
+- [x] RelevanceTruthAndCompletenessEvaluator
 - [/] IntentResolutionEvaluator
 - [/] TaskAdherenceEvaluator
 - [/] ToolCallAccuracyEvaluator
@@ -57,7 +57,7 @@ This file contains tasks left for constructing the workshop.
 
 ### Safety
 
-- [/] GroundednessProEvaluator
+- [x] GroundednessProEvaluator
 - [/] ProtectedMaterialEvaluator
 - [/] UngroundedAttributesEvaluator
 - [/] HateAndUnfairnessEvaluator
