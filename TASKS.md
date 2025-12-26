@@ -45,7 +45,7 @@ This file contains tasks left for constructing the workshop.
 - [x] EquivalenceEvaluator
 - [x] GroundednessEvaluator
 - [x] RelevanceTruthAndCompletenessEvaluator
-- [/] IntentResolutionEvaluator
+- [x] IntentResolutionEvaluator
 - [/] TaskAdherenceEvaluator
 - [/] ToolCallAccuracyEvaluator
 

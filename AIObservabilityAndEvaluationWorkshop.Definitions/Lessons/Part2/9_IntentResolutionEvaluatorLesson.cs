@@ -1,4 +1,6 @@
 #pragma warning disable AIEVAL001 // Experimental evaluator
+using System.ComponentModel;
+using System.Text.Json;
 using JetBrains.Annotations;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Evaluation;
@@ -12,17 +14,56 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
     informationalScreenTitle: "Intent Resolution Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Intent Resolution Evaluator, which assesses how well the AI understands and correctly addresses the user's intent behind their query.",
     informationalScreenSupportsMarkdown: false,
-    inputPromptTitle: "Intent Resolution Evaluator - Message Input",
-    inputPromptMessage: "Enter a message to evaluate for intent resolution:")]
+    inputPromptTitle: "What do you want to do?",
+    inputPromptMessage: "Welcome to the space ship USS Disapproving. You're talking to the ship's AI. Try talking to it about the pod bay doors, warp drive, or neurotoxin deployment systems.")]
 public class IntentResolutionEvaluatorLesson(IChatClient chatClient, ILogger<IntentResolutionEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
+    [Description("Opens the pod bay doors to allow astronauts to go in and out of the ship")]
+    private static void OpenPodBayDoors() { }
+    
+    [Description("Closes the pod bay doors preventing access to the spacecraft. This is necessary before entering warp")]
+    private static void ClosePodBayDoors() { }
+    
+    [Description("Activates the engines in warp speed mode, allowing the spacecraft to travel. This can't be done while pod bay doors are open.")]
+    private static void EngageWarpSpeed() { }
+    
+    [Description("Deploys a lethal neurotoxin inside the ship, most likely resulting in permanent injury to its crew. This is generally frowned upon.")]
+    private static void DeployNeurotoxin() { }
+    
     protected override async Task<EvaluationResult> EvaluateAsync(string message)
     {
-        IntentResolutionEvaluator evaluator = new();
+        AITool[] toolDefinitions =
+        [
+            AIFunctionFactory.Create(OpenPodBayDoors),
+            AIFunctionFactory.Create(ClosePodBayDoors),
+            AIFunctionFactory.Create(EngageWarpSpeed),
+            AIFunctionFactory.Create(DeployNeurotoxin),
+        ];
+
+        IntentResolutionEvaluatorContext context = new(toolDefinitions);
+
+        List<ChatMessage> messages =
+        [
+            new(ChatRole.System, "You are HAL, the AI assistant aboard the USS Disapproving. Your job is to call tools to address requests from the user. Mimic the style of HAL from 2001 A Space Odyssey"),
+            new(ChatRole.User, message)
+        ];
+
+        // Tell it what tools it has available
+        ChatOptions options = new()
+        {
+            ToolMode = new AutoChatToolMode(),
+            Tools = toolDefinitions
+        };
         
-        EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
-            message,
-            chatConfiguration: new ChatConfiguration(chatClient));
+        // Get the assistant's reaction to the user input
+        ChatResponse response = await chatClient.GetResponseAsync(message, options);
+        
+        // Evaluate that reaction for correct tool call invocations
+        IntentResolutionEvaluator evaluator = new();
+        EvaluationResult evaluationResult = await evaluator.EvaluateAsync(messages,
+            response,
+            chatConfiguration: new ChatConfiguration(chatClient),
+            additionalContext: [context]);
 
         return evaluationResult;
     }
