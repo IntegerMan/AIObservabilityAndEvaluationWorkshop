@@ -110,7 +110,7 @@ public abstract class EvaluatorLessonBase(ILogger<EvaluatorLessonBase> logger) :
         ContentSafetyServiceConfiguration? config = sp.GetService<ContentSafetyServiceConfiguration>();
         if (config == null)
         {
-            logger.LogWarning("No content safety service configuration found. Likely not on Azure Identity or no AIContentSafetyEndpoint configured. Expect Content Safety Evaluators to error");
+            logger.LogWarning("No content safety service configuration found. Likely not on Azure Identity or no AIFoundryProjectEndpoint configured. Expect Content Safety Evaluators to error");
             return new ChatConfiguration(chatClient);
         }
 

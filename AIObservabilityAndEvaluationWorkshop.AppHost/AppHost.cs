@@ -8,7 +8,7 @@ var enableSensitiveDataLogging = builder.AddParameter("EnableSensitiveDataLoggin
 var aiProvider = builder.AddParameter("AIProvider", secret: false);
 var aiModel = builder.AddParameter("AIModel", secret: false);
 var aiEndpoint = builder.AddParameter("AIEndpoint", secret: false);
-var aiContentSafetyEndpoint = builder.AddParameter("AIContentSafetyEndpoint", secret: false);
+var AIFoundryProjectEndpoint = builder.AddParameter("AIFoundryProjectEndpoint", secret: false);
 var aiKey = builder.AddParameter("AIKey", secret: true);
 var aiUseIdentity = builder.AddParameter("AIUseAzureIdentity", secret: false);
 var allowUntrustedCertificates = builder.AddParameter("AllowUntrustedCertificates", secret: false);
@@ -34,7 +34,7 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-
     .WithEnvironment("AIProvider", aiProvider)
     .WithEnvironment("AIModel", aiModel)
     .WithEnvironment("AIEndpoint", aiEndpoint)
-    .WithEnvironment("AIContentSafetyEndpoint", aiContentSafetyEndpoint)
+    .WithEnvironment("AIFoundryProjectEndpoint", AIFoundryProjectEndpoint)
     .WithEnvironment("AIKey", aiKey)
     .WithEnvironment("AIUseIdentity", aiUseIdentity)
     .WithEnvironment("AllowUntrustedCertificates", allowUntrustedCertificates)

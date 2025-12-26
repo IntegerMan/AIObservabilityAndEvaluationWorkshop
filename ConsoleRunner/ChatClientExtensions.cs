@@ -19,7 +19,7 @@ public static class ChatClientExtensions
         string aiProvider = configuration["AIProvider"] ?? "Ollama";
         bool useIdentity = configuration.GetValue("AIUseIdentity", false);
         string? endpoint = configuration["AIEndpoint"];
-        string? safetyEndpoint = configuration["AIContentSafetyEndpoint"];
+        string? safetyEndpoint = configuration["AIFoundryProjectEndpoint"];
 
         services.AddChatClient(_ =>
             {

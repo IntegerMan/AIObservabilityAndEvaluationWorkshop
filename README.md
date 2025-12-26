@@ -64,7 +64,7 @@ Once created, go to the Keys and Endpoints blade in the Resource Management grou
 
 ![Content Safety Endpoint](Images/ContentSafetyKeysAndEndpoints.png)
 
-You'll use this for the `AIContentSafetyEndpoint` optional configuration setting in `appsettings.json`
+You'll use this for the `AIFoundryProjectEndpoint` optional configuration setting in `appsettings.json`
 
 #### Setting up identity authentication
 
@@ -108,6 +108,7 @@ Here's a sample config section indicating Azure Identity authentication:
     "AIModel": "gpt-4o",
     "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
     "AIKey": "",
+    "AIFoundryProjectEndpoint": "https://YourResourceName-resource.services.ai.azure.com/api/projects/YourProjectName",
     "AIUseAzureIdentity": "true",
     "AllowUntrustedCertificates": "false",
     "EvaluationResultsPath": "../EvaluationResults",
@@ -127,6 +128,7 @@ Here's an alternative that uses the simpler key-based authentication (Note: cont
     "AIModel": "gpt-4o",
     "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
     "AIKey": "MyApiKey",
+    "AIFoundryProjectEndpoint": "",
     "AIUseAzureIdentity": "true",
     "AllowUntrustedCertificates": "false",
     "EvaluationResultsPath": "../EvaluationResults",
