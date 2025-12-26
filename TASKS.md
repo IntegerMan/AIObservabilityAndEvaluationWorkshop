@@ -51,7 +51,7 @@ This file contains tasks left for constructing the workshop.
 
 ### NLP
 
-- [/] BLEUEvaluator
+- [x] BLEUEvaluator
 - [/] GLEUEvaluator
 - [/] F1Evaluator
 

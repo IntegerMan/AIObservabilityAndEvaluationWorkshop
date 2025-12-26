@@ -11,23 +11,22 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
     informationalScreenTitle: "BLEU Evaluator",
     informationalScreenMessage: "This lesson demonstrates the BLEU (Bilingual Evaluation Understudy) Evaluator, which measures the similarity between generated text and reference text using n-gram precision. It's commonly used for machine translation evaluation.",
     informationalScreenSupportsMarkdown: false,
-    inputPromptTitle: "BLEU Evaluator - Message Input",
-    inputPromptMessage: "Enter a message to evaluate using BLEU score:")]
-public class BLEUEvaluatorLesson(IChatClient chatClient, ILogger<BLEUEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
+    inputPromptTitle: "Please translate this from English to French",
+    inputPromptMessage: "Message to translate: 'Hello, I am a computer.'")]
+public class BleuEvaluatorLesson(IChatClient chatClient, ILogger<BleuEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
     protected override async Task<EvaluationResult> EvaluateAsync(string message)
     {
-        // First, get a response from the chat client
-        var response = await chatClient.GetResponseAsync([new ChatMessage(ChatRole.User, message)]);
-        
         BLEUEvaluator evaluator = new();
+        BLEUEvaluatorContext context = new("Bonjour, je suis un ordinateur!");
         
-        // BLEU evaluator compares a response to reference responses
-        // For this lesson, we'll use the response as both the response and a simple reference
-        // In practice, you would have actual reference responses to compare against
         EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
-            [new ChatMessage(ChatRole.User, message)],
-            response);
+            [
+                new ChatMessage(ChatRole.System, "You are a translation bot translating inputs from English to French"),
+                new ChatMessage(ChatRole.User, "Hello, I am a computer.")
+            ],
+            new ChatResponse(new ChatMessage(ChatRole.Assistant, message)),
+            additionalContext: [context]);
 
         return evaluationResult;
     }
