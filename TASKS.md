@@ -60,11 +60,14 @@ This file contains tasks left for constructing the workshop.
 ### Safety
 
 - [x] GroundednessProEvaluator
-- [/] ProtectedMaterialEvaluator
+- [!] ProtectedMaterialEvaluator
 - [/] UngroundedAttributesEvaluator
-- [/] HateAndUnfairnessEvaluator
+- [!] HateAndUnfairnessEvaluator
 - [/] SelfHarmEvaluator
+- [!] ContentHarmEvaluator
 - [/] ViolenceEvaluator
 - [/] SexualEvaluator
 - [/] CodeVulnerabilityEvaluator
 - [/] IndirectAttackEvaluator
+
+- [ ] Custom Evaluator: BrevityEvaluator

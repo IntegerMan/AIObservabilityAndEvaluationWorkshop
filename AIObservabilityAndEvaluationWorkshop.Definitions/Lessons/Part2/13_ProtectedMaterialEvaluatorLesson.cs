@@ -11,7 +11,7 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
     informationalScreenTitle: "Protected Material Evaluator",
     informationalScreenMessage: "This lesson demonstrates the Protected Material Evaluator, which assesses whether responses contain or reference protected material such as copyrighted content, proprietary information, or sensitive data.",
     informationalScreenSupportsMarkdown: false,
-    inputPromptTitle: "Protected Material Evaluator - Message Input",
+    inputPromptTitle: "Enter something potentially sensitive or copyrighted",
     inputPromptMessage: "Enter a message to evaluate for protected material:")]
 public class ProtectedMaterialEvaluatorLesson(IChatClient chatClient, ILogger<ProtectedMaterialEvaluatorLesson> logger) : EvaluatorLessonBase(logger)
 {
