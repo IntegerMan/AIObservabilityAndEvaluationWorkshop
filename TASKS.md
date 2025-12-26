@@ -33,9 +33,9 @@ This file contains tasks left for constructing the workshop.
 - [ ] Prompt Selection
 
 ## Evaluators
-
-- [ ] CompositeEvaluator
+ 
 - [ ] Unit Testing with Evaluators
+- [ ] Custom Evaluator: BrevityEvaluator
 
 ### Quality
 
@@ -70,5 +70,3 @@ This file contains tasks left for constructing the workshop.
 - [!] ViolenceEvaluator
 - [!] SexualEvaluator
 - [ ] Investigate / report safety evaluator errors
-
-- [ ] Custom Evaluator: BrevityEvaluator
