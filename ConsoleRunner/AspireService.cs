@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.IO;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using Microsoft.Extensions.Logging;

@@ -1,7 +1,5 @@
 #pragma warning disable ASPIREINTERACTION001 // Interaction Service is for evaluation purposes only
 
-using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using AIObservabilityAndEvaluationWorkshop.Definitions;

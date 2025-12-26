@@ -4,7 +4,6 @@ using AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 using AIObservabilityAndEvaluationWorkshop.Definitions.Reporting;
-using Microsoft.Extensions.AI.Evaluation.Safety;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
