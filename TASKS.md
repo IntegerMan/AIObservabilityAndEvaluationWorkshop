@@ -39,7 +39,7 @@ This file contains tasks left for constructing the workshop.
 
 - [x] RelevanceEvaluator
 - [x] CompletenessEvaluator
-- [/] RetrievalEvaluator
+- [x] RetrievalEvaluator
 - [x] FluencyEvaluator
 - [/] CoherenceEvaluator
 - [/] EquivalenceEvaluator
