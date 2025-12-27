@@ -90,12 +90,12 @@ try
             catch (Exception ex)
             {
                 failed++;
-                logger.LogError(ex, "✗ Test failed: {TestClass}.{TestMethod}", testType.Name, testMethod.Name);
+                logger.LogError("✗ Test failed: {TestClass}.{TestMethod} - {ErrorMessage}", 
+                    testType.Name, testMethod.Name, ex.InnerException?.Message ?? ex.Message);
                 testActivity?.SetStatus(ActivityStatusCode.Error, ex.Message);
                 testActivity?.AddException(ex);
                 
                 // Re-throw to maintain test failure behavior
-                // The exception will be wrapped by reflection invocation
                 if (ex.InnerException != null)
                 {
                     throw ex.InnerException;

@@ -31,11 +31,7 @@ public class FluencyEvaluatorTest : ObservableTestBase
             // Act
             string sampleMessage = "Hello, how are you?";
             ChatMessage[] messages = [new ChatMessage(ChatRole.User, sampleMessage)];
-            
-            SetTag("test.input.message", sampleMessage);
-            
             ChatResponse response = await chatClient.GetResponseAsync(sampleMessage);
-            AddEvent("Chat response received");
             
             EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
                 messages,
@@ -43,8 +39,6 @@ public class FluencyEvaluatorTest : ObservableTestBase
                 chatConfiguration: new ChatConfiguration(chatClient));
 
             // Assert
-            SetTag("evaluation.metrics.count", evaluationResult.Metrics.Count);
-
             bool allMetricsPassed = true;
             string? firstFailedMetric = null;
 
@@ -62,11 +56,6 @@ public class FluencyEvaluatorTest : ObservableTestBase
                     $"Evaluation metric '{metric.Key}' failed. Reason: {metric.Value.Reason}. " +
                     $"Interpretation: {metric.Value.Interpretation?.Reason ?? "No interpretation provided"}");
             }
-
-            // Record metrics for telemetry
-            RecordEvaluationMetrics(
-                evaluationResult.Metrics,
-                m => m.Interpretation?.Failed ?? false);
 
             await host.StopAsync();
             CompleteTest(allMetricsPassed, 
