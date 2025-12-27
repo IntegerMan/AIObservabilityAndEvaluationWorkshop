@@ -6,23 +6,12 @@ namespace AIObservabilityAndEvaluationWorkshop.Definitions;
 
 public abstract class LessonBase
 {
-    public virtual string DisplayName => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.DisplayName ?? GetType().Name;
-
-    public virtual bool NeedsInput => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.NeedsInput ?? true;
-
-    public virtual string? InputPromptTitle => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.InputPromptTitle;
-
-    public virtual string? InputPromptMessage => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.InputPromptMessage;
-
-    public virtual string? InformationalScreenTitle => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.InformationalScreenTitle;
-
-    public virtual string? InformationalScreenMessage => 
-        GetType().GetCustomAttribute<LessonAttribute>()?.InformationalScreenMessage;
+    public virtual string DisplayName => GetLessonAttribute().DisplayName;
+    public virtual bool NeedsInput => GetLessonAttribute().NeedsInput;
+    public virtual string? InputPromptTitle => GetLessonAttribute().InputPromptTitle;
+    public virtual string? InputPromptMessage => GetLessonAttribute().InputPromptMessage;
+    public virtual string? InformationalScreenTitle => GetLessonAttribute().InformationalScreenTitle;
+    public virtual string? InformationalScreenMessage => GetLessonAttribute().InformationalScreenMessage;
 
     private readonly ActivitySource _activitySource;
 
@@ -33,7 +22,7 @@ public abstract class LessonBase
 
     public async Task<ConsoleResult> ExecuteAsync(string message, ILogger logger)
     {
-        using Activity? activity = _activitySource.StartActivity($"Executing Lesson {DisplayName}");
+        using Activity? activity = _activitySource.StartActivity($"Executing Lesson {DisplayName}", ActivityKind.Internal);
         
         activity?.SetTag("lesson.display_name", DisplayName);
         activity?.SetTag("input.message", message);
@@ -64,4 +53,7 @@ public abstract class LessonBase
     }
 
     protected abstract Task<string> RunAsync(string message);
+    
+    protected LessonAttribute GetLessonAttribute() => 
+        GetType().GetCustomAttribute<LessonAttribute>() ?? throw new InvalidOperationException("LessonAttribute is required on lessons.");
 }

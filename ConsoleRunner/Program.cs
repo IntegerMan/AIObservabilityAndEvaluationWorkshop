@@ -3,7 +3,8 @@ using System.Diagnostics;
 using AIObservabilityAndEvaluationWorkshop.ConsoleRunner;
 using AIObservabilityAndEvaluationWorkshop.Definitions;
 using AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
-using AIObservabilityAndEvaluationWorkshop.Definitions.Reporting;
+using Microsoft.Extensions.AI.Evaluation.Reporting;
+using Microsoft.Extensions.AI.Evaluation.Reporting.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,23 @@ builder.Services.AddConfiguredChatClient(builder.Configuration);
 
 if (builder.Configuration["ReportStorageType"]?.ToLowerInvariant() == "azure")
 {
-    builder.Services.AddScoped<IReportStorageStrategy, AzureReportStorageStrategy>();
+    //builder.Services.AddScoped<IEvaluationResultStore, AzureReportStorageStrategy>();
+    throw new NotImplementedException("Azure storage coming soon");
 }
 else
 {
-    builder.Services.AddScoped<IReportStorageStrategy, DiskReportStorageStrategy>();
+    builder.Services.AddScoped<IEvaluationResultStore>(_ =>
+    {
+        string path = builder.Configuration["ReportsPath"] ?? throw new InvalidOperationException("Ensure ReportsPath is configured");
+        
+        // Get an asbolute path if this is a relative reference.
+        if (!Path.IsPathRooted(path))
+        {
+            path = Path.GetFullPath( path, Environment.CurrentDirectory);
+        }
+        
+        return new DiskBasedResultStore(path);
+    });
 }
 
 builder.Services.Scan(scan => scan

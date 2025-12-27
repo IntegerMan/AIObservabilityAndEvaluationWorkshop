@@ -1,81 +1,62 @@
 using System.Reflection;
-using AIObservabilityAndEvaluationWorkshop.Definitions.Reporting;
 using JetBrains.Annotations;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.AI.Evaluation;
 using Microsoft.Extensions.AI.Evaluation.Quality;
 using Microsoft.Extensions.AI.Evaluation.Reporting;
+using Microsoft.Extensions.AI.Evaluation.Reporting.Formats.Html;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
 [Lesson(3, 1, "Report Generation", needsInput: true,
     informationalScreenTitle: "Report Generation",
-    informationalScreenMessage: "This lesson demonstrates how to generate evaluation reports. The system will evaluate your input using a Fluency Evaluator and generate an HTML report that you can view in your browser.",
-    inputPromptTitle: "Report Generation - Message Input",
-    inputPromptMessage: "Enter a message to evaluate and generate a report for:")]
+    informationalScreenMessage:  "This lesson demonstrates how to generate evaluation reports. The system will evaluate your input using a Fluency Evaluator and generate an HTML report that you can view in your browser.",
+    inputPromptTitle: "Customer Service Response Fluency",
+    inputPromptMessage: "You're chatting with a corporate help bot running an online commerce applicaiton. Ask it a question and we'll evaluate the fluency of its response.")]
 public class ReportGenerationLesson(
     IChatClient chatClient,
-    IReportStorageStrategy storageStrategy) : LessonBase
+    IConfiguration configuration,
+    ILogger<ReportGenerationLesson> logger,
+    IEvaluationResultStore resultStore) : ReportLessonBase(chatClient)
 {
     protected override async Task<string> RunAsync(string message)
     {
-        // 1. Setup the evaluation
         IEvaluator evaluator = new FluencyEvaluator();
+        ReportingConfiguration reportConfig = new([evaluator], 
+            resultStore, 
+            GetChatConfiguration(), 
+            tags: ["CodeMash"]);
+
+        await GetResponseAndEvaluateAsync(message, scenarioName: "Fluency Check for Customer Service Reply", reportConfig);
+
+        IEnumerable<ScenarioRunResult> results = await GetLatestResultsAsync(reportConfig, count: 1);
         
-        // 2. Setup storage for evaluation results
-        ReportingConfiguration reportingConfig = await storageStrategy.CreateConfigurationAsync([evaluator]);
-
-        // 3. Perform the evaluation as a scenario run
-        // We wrap the chatClient to ensure we don't use temperature 0 which some models (like o1) don't support
-        IChatClient wrappedChatClient = new ConfigureOptionsChatClient(chatClient, options => options.Temperature = 1.0f);
-
-        // Create a scenario run
-        await using ScenarioRun run = await reportingConfig.CreateScenarioRunAsync(
-            scenarioName: "Fluency Check",
-            iterationName: DateTime.Now.ToString("yyyyMMdd_HHmmss"));
-
-        // EvaluationResult is from Microsoft.Extensions.AI.Evaluation
-        EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
-            message,
-            chatConfiguration: new ChatConfiguration(wrappedChatClient));
-
-        ScenarioRunResult runResult = new(
-            "Fluency Check",
-            run.IterationName,
-            reportingConfig.ExecutionName,
-            DateTime.Now,
-            messages:[], 
-            modelResponse: new ChatResponse(new ChatMessage(ChatRole.Assistant, message)),
-            evaluationResult: evaluationResult);
-
-        // Get this lesson's part and order to use as the filename
-        LessonAttribute lessonAttribute = GetType().GetCustomAttribute<LessonAttribute>()!;
-        int part = lessonAttribute.Part;
-        int order = lessonAttribute.Order;
-        string filename = $"{part}_{order}_Report.html";
-
-        // 4. Generate the report using the strategy
-        string fullPath = await storageStrategy.WriteReportAsync(reportingConfig, runResult, filename);
-        fullPath = fullPath.Replace('\\', '/'); // Clean up URLs for markdown links
-        if (!fullPath.StartsWith("http") && !fullPath.StartsWith("file"))
+        string filename = GetReportFileName();
+        logger.LogDebug("Using report filename {Filename}", filename);
+        
+        // Get an asbolute path if this is a relative reference.
+        string path = configuration["ReportsPath"] ?? "Reports";
+        if (!Path.IsPathRooted(path))
         {
-            fullPath = $"file:///{fullPath}";
+            path = Path.GetFullPath(path, Environment.CurrentDirectory);
         }
+        path = Path.Combine(path, filename);
+        
+        logger.LogDebug("Using report location {Path}", path);
 
-        evaluationResult.Metrics.TryGetValue(FluencyEvaluator.FluencyMetricName, out var finalMetric);
-        double finalGrade = (finalMetric as NumericMetric)?.Value ?? 0;
-
-        // Return the link in markdown format
+        HtmlReportWriter writer = new(path);
+        await writer.WriteReportAsync(results);
+        
+        // Return the link in Markdown format
+        Uri uri = new Uri(path);
         return $"""
-               ### Evaluation Complete
-               
-               The fluency of your input has been evaluated and a report has been generated.
+                ### Evaluation and Report Generation Complete
 
-               Fluency Grade: {finalGrade} / 5
-               
-               **Report location:**
-               [{fullPath}]({fullPath})
-               """;
+                **Report location:**
+                [{uri.AbsoluteUri}]({uri.AbsoluteUri})
+                """;
     }
 }

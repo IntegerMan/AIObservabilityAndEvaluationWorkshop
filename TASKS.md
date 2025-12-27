@@ -25,15 +25,6 @@ This file contains tasks left for constructing the workshop.
 - [x] Add activity kinds to the OpenTelemetry lesson
 - [ ] Add additional instrumentation / metrics for tool call analytics
 
-## Reporting
-
-- [ ] Get Azure Storage working
-- [ ] Get Custom Storage working
-- [ ] Multiple evaluators in a report
-- [ ] Trends over time
-- [ ] Model Selection
-- [ ] Prompt Selection
-
 ## Evaluators
  
 - [ ] Unit Testing with Evaluators
@@ -73,3 +64,12 @@ This file contains tasks left for constructing the workshop.
 - [x] ViolenceEvaluator
 - [x] SexualEvaluator
 - [x] Investigate / report safety evaluator errors
+
+## Reporting
+
+- [ ] Get Azure Storage working (Stretch)
+- [ ] Get Custom Storage working (Stretch)
+- [ ] Multiple evaluators in a report
+- [ ] Trends over time
+- [ ] Model Selection
+- [ ] Prompt Selection
