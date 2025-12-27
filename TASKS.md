@@ -27,7 +27,7 @@ This file contains tasks left for constructing the workshop.
 
 ## Evaluators
  
-- [ ] Unit Testing with Evaluators
+- [x] Unit Testing with Evaluators
 - [ ] Custom Evaluator: BrevityEvaluator (Stretch)
 - [ ] Adding metrics and diagnostics (Stretch)
 
