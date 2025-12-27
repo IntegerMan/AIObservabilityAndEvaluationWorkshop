@@ -8,42 +8,74 @@ using Xunit;
 
 namespace AIObservabilityAndEvaluationWorkshop.Tests;
 
-public class FluencyEvaluatorTest
+public class FluencyEvaluatorTest : ObservableTestBase
 {
     [Fact]
     public async Task ChatResponse_ShouldPassFluencyEvaluation()
     {
-        // Arrange
-        HostApplicationBuilder builder = Host.CreateApplicationBuilder();
-        builder.AddServiceDefaults();
-        builder.Services.AddConfiguredChatClient(builder.Configuration);
+        StartTest(nameof(ChatResponse_ShouldPassFluencyEvaluation));
 
-        IHost host = builder.Build();
-        await host.StartAsync();
-
-        IChatClient chatClient = host.Services.GetRequiredService<IChatClient>();
-        FluencyEvaluator evaluator = new();
-
-        // Act
-        string sampleMessage = "Hello, how are you?";
-        ChatMessage[] messages = [new ChatMessage(ChatRole.User, sampleMessage)];
-        ChatResponse response = await chatClient.GetResponseAsync(sampleMessage);
-        
-        EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
-            messages,
-            response,
-            chatConfiguration: new ChatConfiguration(chatClient));
-
-        // Assert
-        foreach (var metric in evaluationResult.Metrics)
+        try
         {
-            bool failed = metric.Value.Interpretation?.Failed ?? false;
-            Assert.False(failed, 
-                $"Evaluation metric '{metric.Key}' failed. Reason: {metric.Value.Reason}. " +
-                $"Interpretation: {metric.Value.Interpretation?.Reason ?? "No interpretation provided"}");
-        }
+            // Arrange
+            HostApplicationBuilder builder = Host.CreateApplicationBuilder();
+            builder.AddServiceDefaults();
+            builder.Services.AddConfiguredChatClient(builder.Configuration);
 
-        await host.StopAsync();
+            IHost host = builder.Build();
+            await host.StartAsync();
+
+            IChatClient chatClient = host.Services.GetRequiredService<IChatClient>();
+            FluencyEvaluator evaluator = new();
+
+            // Act
+            string sampleMessage = "Hello, how are you?";
+            ChatMessage[] messages = [new ChatMessage(ChatRole.User, sampleMessage)];
+            
+            SetTag("test.input.message", sampleMessage);
+            
+            ChatResponse response = await chatClient.GetResponseAsync(sampleMessage);
+            AddEvent("Chat response received");
+            
+            EvaluationResult evaluationResult = await evaluator.EvaluateAsync(
+                messages,
+                response,
+                chatConfiguration: new ChatConfiguration(chatClient));
+
+            // Assert
+            SetTag("evaluation.metrics.count", evaluationResult.Metrics.Count);
+
+            bool allMetricsPassed = true;
+            string? firstFailedMetric = null;
+
+            foreach (var metric in evaluationResult.Metrics)
+            {
+                bool failed = metric.Value.Interpretation?.Failed ?? false;
+                
+                if (failed)
+                {
+                    allMetricsPassed = false;
+                    firstFailedMetric ??= metric.Key;
+                }
+
+                Assert.False(failed, 
+                    $"Evaluation metric '{metric.Key}' failed. Reason: {metric.Value.Reason}. " +
+                    $"Interpretation: {metric.Value.Interpretation?.Reason ?? "No interpretation provided"}");
+            }
+
+            // Record metrics for telemetry
+            RecordEvaluationMetrics(
+                evaluationResult.Metrics,
+                m => m.Interpretation?.Failed ?? false);
+
+            await host.StopAsync();
+            CompleteTest(allMetricsPassed, 
+                allMetricsPassed ? null : $"Metric '{firstFailedMetric}' failed evaluation");
+        }
+        catch (Exception ex)
+        {
+            RecordException(ex);
+            throw;
+        }
     }
 }
-
