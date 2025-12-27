@@ -6,26 +6,29 @@ See [AGENDA.md](AGENDA.md) for the workshop schedule and exercises.
 
 ## Setup and Requirements
 
+To get rolling with this workshop you'll need a few key things:
+
+- [The Repository Cloned Locally](https://github.com/IntegerMan/AIObservabilityAndEvaluationWorkshop)
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
 - [Tooling compatible with Aspire (VS 2022 / 2026), VS Code, Rider, Cursor, etc.](https://learn.microsoft.com/en-us/dotnet/aspire/fundamentals/setup-tooling)
+- Either [Docker Desktop](https://www.docker.com/products/docker-desktop) or [Podman](https://podman.io/) installed locally. Note that licensing for Docker Desktop may be problematic on corporate machines.
 
-Some examples will use containerized resources. For these you will need either:
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop) * licensing may not be advisable on corporate machines
-- [Podman](https://podman.io/)
+You will likely optionally want to use a cloud resource for your LLM. This workshop supports Azure OpenAI and OpenAI (and compatible endpoints) resources. A small portion of this workshop does use Microsoft Foundry and requires Identity Authentication. If you run the examples with other models, you will likely encounter errors but still be able to get an educational experience looking at the responses from the LLMs. This document will walk you through the optional configuration steps for Microsoft Foundry if you'd like and we'll demo the Foundry components live if you want to see the non-erroring version without the fuss of additional setup.
 
 We recommend launching the application in advance with a stable internet connection to allow the appropriate container images to be downloaded.
 
-### Azure Cloud Resources (Optional)
+## Detailed Setup Instructions
 
 Aside from the Azure Content Safety portion, all workshop contents can be run using local models via Ollama, using advanced cloud-based models will provide more accurate evaluations and better overall performance.
 
-We recommend setting up an Azure OpenAI resource if you have access to one and setting up identity authentication to make things easier for you and to enable safety evaluators.
+We've noticed that while llama3.2 is a lovely model that's capable of running on most machines, it is a slow beast and it can be confused by more complex prompts such as those used by a few of the evaluators.
+
+To avoid this, we recommend using an OpenAI or Azure OpenAI deployed gpt-4o model to take advantage of faster generation speeds. Using Azure also allows you to get good responses from the portions of this workshop that use evaulators that rely on Azure Content Moderation, which require Microsoft Foundry.
 
 > [!NOTE]
-> Azure resources may have an associated cost, including per-use costs with the base model LLMs. Monitor your usage and set up budget alerts if necessary.
+> OpenAI and Azure resources have an associated cost, including per-use costs with the base model LLMs. Monitor your usage and set up budget alerts if necessary.
 
-#### Setting up Azure OpenAI
+#### Setting up Azure OpenAI without Microsoft Foundry
 
 1. **Search the Marketplace**: In the Azure Portal, search for "Azure OpenAI" in the Marketplace.
 
@@ -39,36 +42,57 @@ We recommend setting up an Azure OpenAI resource if you have access to one and s
 
    ![Keys and Endpoints](Images/AzKeysAndEndpoints.png)
 
-4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We recommend using **gpt-4o**, which MEAI Evaluation recommends as a tested library, and keeping the default deployment name.
+4. **Deploy a Model**: Navigate to **Model deployments** and click **Manage Deployments** to open Azure AI Foundry (formerly Azure AI Studio). Create a new deployment. We strongly recommend using **gpt-4o**, which MEAI Evaluation recommends as a tested library, and keeping the default deployment name.
 
    ![Create Project](Images/AzCreateProject.png)
-   ![Build in Foundry](Images/AzFoundryBuild.png)
 
-#### Setting up Content Safety
+Now that you have these resources deployed, take your endpoint, API key, and deployment name and use them in the `AIEndpoint`, `AIKey`, and `AIModel` settings in `appsettings.json`. Also set `AIProvider` to `Azure`.
 
-If you plan on using the content safety evaluators, you'll need to authenticate with identity authentication (see next section) and you'll need to have a content safety resource created and configured.
+A sample valid config file follows:
 
-You can find Content Safety in the Azure Portal by searching for Content Safety.
+```json
+  "ParametersAZ": {
+    "AIUseAzureIdentity": "false",
+    "AIProvider": "Azure",
+    "AIModel": "gpt-4o",
+    "AIKey": "YourKeyHere",
+    "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
+    "AIFoundryProjectEndpoint": ""
+  },
+```
 
-![Content Safety Resource](Images/ContentSafetyResource.png)
+Note that you will encounter some errors when running content safety evaluators during a small part of the workshop.
 
-Next Click Create and specify your details. I recommend using the same resource group you used for Azure OpenAI. 
+### Using Microsoft Foundry on Azure
 
-**Important Note: This resource must be in one of [several limited regions](https://learn.microsoft.com/en-us/azure/ai-foundry/concepts/evaluation-evaluators/risk-safety-evaluators) at the moment. I recommend choosing `East US 2`**
+Using Microsoft Foundry and identity authentication should allow you to run all parts of the workshop without errors. Microsoft Foundry also gives you access to some additional analytics around your deployed models which will be interesting as well.
 
-You should be fine with a `Free F0` resource tier.
+To get started, go to [AI.Azure.com](https://ai.azure.com) and authenticate using your Azure account.
 
-![Create Content Safety Resource](Images/CreateContentSafety.png)
+Then create a new project, specifying a Microsoft Foundry resource (not an AI Hub) and enter the details for your project.
 
-Once created, go to the Keys and Endpoints blade in the Resource Management group to find your endpoint. Since we'll be forced into Identity Authentication we won't need the keys.
+![Create a new Project](Images/CreateFoundryProject.png)
 
-![Content Safety Endpoint](Images/ContentSafetyKeysAndEndpoints.png)
+> [!NOTE]
+> **Important:** You should select `East US 2` as your region as some of the features we're working with are in preview and only available in this region.
 
-You'll use this for the `AIFoundryProjectEndpoint` optional configuration setting in `appsettings.json`
+Next, go to **Models + endpoints** in the sidebar and choose to deploy a new base model. We'll need an instance of `gpt-4o` for this workshop as it is the resource Microsoft has tested the evaluations library the most with.
 
-#### Setting up identity authentication
+For deployment type, I usually select Global Standard or Standard if I have data residency concerns.
 
-If you plan on using identity authentication, your user will need to have the **Cognitive Services OpenAI User** and **Cognitive Services User** roles on your Azure OpenAI resource.
+Once this is complete, go to the Overview page of the resource to find your Azure OpenAI endpoint as shown here:
+
+![Foundry Project Overview](Images/FoundryOverview.png)
+
+You should use your **Microsoft Foundry project endpoint** setting in the `AIFoundryProjectEndpoint` setting in `appsettings.json` (or in User Secrets) for the `AIObservabilityAndEvaluationWorkshop.AppHost` project.
+
+The **Azure OpenAI Endpoint** also goes in the `appsettings.json` file (or user secrets) as your `AIEndpoint`. You'll also want to use `Azure` as your `AIProvider`. Additionally, your API Key will go into the `AIKey` setting if you're not planning on using Identity authentication (needed for content safety features).
+
+If you want to also be able to run the content safety evaluators without error, you'll need to configure identity authentication for your new Microsoft Foundry resource.
+
+#### Setting up identity authentication with Azure
+
+If you plan on using identity authentication, your user will need to have the **Cognitive Services OpenAI User** and **Cognitive Services User** roles on your Microsoft Foundry resource.
 
 You can do this by going to the resource in the Azure Portal, selecting **Access control (IAM)** on the sidebar, and then clicking **Add role assignment**.
 
@@ -81,7 +105,20 @@ Now select your user and click the various buttons to review and accept the role
 
 Do this same process again for the **Cognitive Services User** role.
 
-#### Logging in for Identity Authentication
+You'll now need to finalize configuration for your resources in `appsettings.json` to specify identity authentication. A sample valid config section follows:
+
+```json
+  "ParametersAZ": {
+    "AIUseAzureIdentity": "true",
+    "AIProvider": "Azure",
+    "AIModel": "gpt-4o",
+    "AIKey": "",
+    "AIEndpoint": "https://YourProject-resource.openai.azure.com/",
+    "AIFoundryProjectEndpoint": "https://YourProject-resource.services.ai.azure.com/api/projects/YourProject"
+  },
+```
+
+#### Authenticating with Azure PowerShell for Identity Authentication
 
 In order to set up identity authentication with Azure, you'll need to install [Azure PowerShell](https://learn.microsoft.com/en-us/powershell/azure/install-azure-powershell).
 
@@ -95,84 +132,36 @@ Log in following the dialog box that opens and select your Azure subscription. Y
 
 See the **Troubleshooting** section later on for additional materials.
 
-#### Configuring the Application
+### Using OpenAI or Compatible APIs
 
-To use your Azure OpenAI deployment, update the `AIObservabilityAndEvaluationWorkshop.AppHost/appsettings.json` file.
+If you want to avoid Azure but also don't want to use a local Ollama model, you can use an OpenAI model or OpenAI compatible endpoint with this workshop.
 
-Here's a sample config section indicating Azure Identity authentication:
+The easiest way of doing this is to use OpenAI itself. Start out by going to the [OpenAI Platform's API Keys page](https://platform.openai.com/api-keys). You may need to authenticate and/or create an account. Creating an account and setting up billing are not covered here in this documentation.
+
+Next, click **Create new secret key**.
+
+Give your key a meaningful name and customize other settings as you need (I've left them at their defaults for this screenshot).
+
+![Creating an OpenAI Key](Images/NewOpenAIKey.png)
+
+Next, click Create secret key and copy it to your clipboard.
+
+After this, go in to your `appsettings.json` file and customize the parameters section to match your endpoint and key:
 
 ```json
   "Parameters": {
-    "EnableSensitiveDataLogging": "true",
-    "AIProvider": "Azure",
+    "AIUseAzureIdentity": "false",
+    "AIProvider": "OpenAI",
     "AIModel": "gpt-4o",
-    "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
-    "AIKey": "",
-    "AIFoundryProjectEndpoint": "https://YourResourceName-resource.services.ai.azure.com/api/projects/YourProjectName",
-    "AIUseAzureIdentity": "true",
-    "AllowUntrustedCertificates": "false",
-    "EvaluationResultsPath": "../EvaluationResults",
-    "ReportsPath": "../Reports",
-    "ReportStorageType": "disk",
-    "AzureStorageConnectionString": "",
-    "AzureStorageContainer": ""
-  }
+    "AIKey": "sk-proj-TheRestOfYourKeyGoesHere",
+    "AIEndpoint": "",
+    "AIFoundryProjectEndpoint": ""
+  },
 ```
 
-Here's an alternative that uses the simpler key-based authentication (Note: content safety evaluators will fail)
+Note that with OpenAI itself you can leave AIEndpoint empty and OpenAI will be assumed. If you're using an OpenAI compatible endpoint, you can customize the AIEndpoint and use that custom resource, but you'll have to get a key some other way.
 
-```json
-  "Parameters": {
-    "EnableSensitiveDataLogging": "true",
-    "AIProvider": "Azure",
-    "AIModel": "gpt-4o",
-    "AIEndpoint": "https://YourResourceName-resource.cognitiveservices.azure.com/",
-    "AIKey": "MyApiKey",
-    "AIFoundryProjectEndpoint": "",
-    "AIUseAzureIdentity": "true",
-    "AllowUntrustedCertificates": "false",
-    "EvaluationResultsPath": "../EvaluationResults",
-    "ReportsPath": "../Reports",
-    "ReportStorageType": "disk",
-    "AzureStorageConnectionString": "",
-    "AzureStorageContainer": ""
-  }
-```
-
-> [!WARNING]
-> Your `AIKey` is sensitive information. **Never commit your API key to version control.**
-
-#### Using User Secrets (Recommended)
-
-Instead of putting your key in `appsettings.json`, we recommend using [.NET User Secrets](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-9.0&tabs=linux) to store your sensitive configuration locally.
-
-To set your key using the command line, run the following from the `AIObservabilityAndEvaluationWorkshop.AppHost` directory:
-
-```bash
-dotnet user-secrets set "Parameters:AIKey" "your-key-goes-here"
-```
-
-#### Manual Configuration
-
-If you choose to use `appsettings.json`, update the following fields:
-
-1. Change `AIProvider` to `"AzureOpenAI"`.
-2. Change `AIModel` to your deployment name (e.g., `"gpt-5.2-chat"`).
-3. Set `AIEndpoint` to your Azure OpenAI endpoint URL.
-4. Set `AIKey` to your Azure OpenAI key.
-
-```json
-{
-  "Parameters": {
-    "AIProvider": "AzureOpenAI",
-    "AIModel": "gpt-5.2-chat",
-    "AIEndpoint": "https://your-resource-name.openai.azure.com/",
-    "AIKey": "your-key-goes-here"
-  }
-}
-```
-
-Alternatively, if you have the Azure CLI installed and are logged in, you can set `AIUseAzureIdentity` to `"true"` and leave `AIKey` blank to use Managed Identity / Entra ID authentication.
+Also note that Microsoft Foundry and Idenitity authentication is required for some of the examples in the workshop. You'll still be able to run the examples and get responses from LLMs in your logs, but you'll see an error.
 
 ### Configuring Report Storage
 
@@ -180,6 +169,8 @@ By default, evaluation reports are stored on your local disk in the `Reports` di
 
 - **To change the local reports path**: Update `ReportsPath` in `appsettings.json`.
 - **To change the local evaluation results path**: Update `EvaluationResultsPath` in `appsettings.json`.
+
+This will be fine for the workshop and you don't need to worry about it in advance. However, if you'd like to see how to configure Azure storage, that's listed here as well.
 
 #### Azure Storage for Reporting (Optional)
 
