@@ -73,4 +73,19 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-
             IsHighlighted = true
         });
 
+// Add the unit test project
+builder.AddProject<AIObservabilityAndEvaluationWorkshop_Tests>("unit-tests")
+    .WithReference(llama)
+    .WithReference(ollama)
+    .WithEnvironment("AI_MODEL", "llama3.2")
+    .WithEnvironment("EnableSensitiveDataLogging", enableSensitiveDataLogging)
+    .WithEnvironment("AIProvider", aiProvider)
+    .WithEnvironment("AIModel", aiModel)
+    .WithEnvironment("AIEndpoint", aiEndpoint)
+    .WithEnvironment("AIFoundryProjectEndpoint", AIFoundryProjectEndpoint)
+    .WithEnvironment("AIKey", aiKey)
+    .WithEnvironment("AIUseIdentity", aiUseIdentity)
+    .WithEnvironment("AllowUntrustedCertificates", allowUntrustedCertificates)
+    .WithExplicitStart();
+
 builder.Build().Run();
