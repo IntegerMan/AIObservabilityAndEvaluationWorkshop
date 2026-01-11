@@ -23,7 +23,7 @@ public class Exercise2Lesson(ILogger<Exercise2Lesson> logger, IChatClient chatCl
          */
 
         // Replace this with the results of your CompositeEvaluator's evaluation
-        return await Task.FromResult(new EvaluationResult({});
+        return await Task.FromResult(new EvaluationResult(new List<EvaluationMetric>()));
     }
 }
 
