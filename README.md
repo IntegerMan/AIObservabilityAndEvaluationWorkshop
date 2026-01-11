@@ -299,6 +299,10 @@ sequenceDiagram
 
 For more details on the implementation, see `AIObservabilityAndEvaluationWorkshop.AppHost/AppHost.cs`.
 
+## AI Use
+
+Generative AI models and tools were used as part of creating code in this workshop, most notably for scaffolding dependencies in Aspire, getting input and output flowing between projects, and connecting a unit test project to an Aspire dashboard for purely demo purposes (please don't actually do this in production code). The core concepts and lessons in this workshop were authored by human minds using the available tools at their disposal.
+
 ## Additional Resources
 
 See the following blog posts or other resources on related topics of interest on things in this workshop:
@@ -306,3 +310,4 @@ See the following blog posts or other resources on related topics of interest on
 - [Microsoft.Extensions.AI.Evaluation Documentation](https://learn.microsoft.com/en-us/dotnet/ai/evaluation/libraries) - official documentation
 - [An LLM Evaluation Framework for AI Systems Performance](https://blog.leadingedje.com/post/ai/evaluation.html) - blog post by [Matt Eland](https://MattEland.dev) on **MEAI Evaluation**
 - [Tracking AI System Performance using AI Evaluation Reports](https://blog.leadingedje.com/post/ai/evaluationreporting.html) - blog post by [Matt Eland](https://MattEland.dev) on **MEAI Evaluation Reporting**
+- [JAIMES AF](https://github.com/IntegerMan/JAIMES-AF) - An AI dungeon master project using Aspire, MEAI Evaluation, Agent Framework, and more! Authored by [Matt Eland](https://MattEland.dev).

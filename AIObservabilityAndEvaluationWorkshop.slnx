@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/Solution Items/">
+    <File Path="AGENDA.md" />
     <File Path="LICENSE.txt" />
     <File Path="README.md" />
-    <File Path="TASKS.md" />
   </Folder>
   <Project Path="AIObservabilityAndEvaluationWorkshop.AppHost/AIObservabilityAndEvaluationWorkshop.AppHost.csproj" />
   <Project Path="AIObservabilityAndEvaluationWorkshop.Definitions/AIObservabilityAndEvaluationWorkshop.Definitions.csproj" Id="31678f72-bf4b-46b4-9e98-df4b8d91025d" />
