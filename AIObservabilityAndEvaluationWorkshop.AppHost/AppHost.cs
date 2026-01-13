@@ -29,7 +29,7 @@ var llama = ollama.AddModel("llama3.2");
 ConsoleAppInteractionHandler handler = new();
 
 // Add the console app project as child of workshop-content
-builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-app")
+builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("lessons")
     .WithParentRelationship(workshopContent)
     .WithReference(llama)
     .WithReference(ollama)

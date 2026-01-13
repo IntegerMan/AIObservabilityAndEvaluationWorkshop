@@ -4,7 +4,7 @@ using Microsoft.Extensions.AI;
 namespace AIObservabilityAndEvaluationWorkshop.Definitions.Lessons;
 
 [UsedImplicitly]
-[Lesson(1, 4, "Hello MEAI", needsInput: true, 
+[Lesson(1, 3, "Hello MEAI", needsInput: true,
     inputPromptTitle: "Hello MEAI - Message Input",
     inputPromptMessage: "Enter a message to send to the AI model:")]
 public class HelloMEAILesson(IChatClient chatClient) : LessonBase
