@@ -3,6 +3,9 @@ using Projects;
 
 IDistributedApplicationBuilder builder = DistributedApplication.CreateBuilder(args);
 
+// Add workshop content as parent resource - grouped resources appear first in dashboard
+var workshopContent = builder.AddWelcomeResource("workshop-content");
+
 var enableSensitiveDataLogging = builder.AddParameter("EnableSensitiveDataLogging", secret: false);
 
 var aiProvider = builder.AddParameter("AIProvider", secret: false);
@@ -25,8 +28,9 @@ var llama = ollama.AddModel("llama3.2");
 // Create interaction handler for console app
 ConsoleAppInteractionHandler handler = new();
 
-// Add the console app project
+// Add the console app project as child of workshop-content
 builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-app")
+    .WithParentRelationship(workshopContent)
     .WithReference(llama)
     .WithReference(ollama)
     .WithEnvironment("AI_MODEL", "llama3.2")
@@ -54,7 +58,7 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-
         string resourceName = e.Resource.Name;
         string key = e.Key;
         string message = e.Message;
-                
+
         await handler.HandleOutputMatchAsync(serviceProvider, properties, resourceName, key, message, ct);
     })
     .WithCommand("start-with-input", "Start with Input", async context =>
@@ -63,7 +67,7 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-
             IServiceProvider serviceProvider = context.ServiceProvider;
             CancellationToken cancellationToken = context.CancellationToken;
             string resourceName = context.ResourceName;
-                
+
             return await handler.HandleStartWithInputCommandAsync(serviceProvider, cancellationToken, resourceName);
         },
         new CommandOptions
@@ -73,8 +77,9 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_ConsoleRunner>("console-
             IsHighlighted = true
         });
 
-// Add the unit test project
+// Add the unit test project as child of workshop-content
 builder.AddProject<AIObservabilityAndEvaluationWorkshop_Tests>("unit-tests")
+    .WithParentRelationship(workshopContent)
     .WithReference(llama)
     .WithReference(ollama)
     .WithEnvironment("AI_MODEL", "llama3.2")
@@ -88,4 +93,8 @@ builder.AddProject<AIObservabilityAndEvaluationWorkshop_Tests>("unit-tests")
     .WithEnvironment("AllowUntrustedCertificates", allowUntrustedCertificates)
     .WithExplicitStart();
 
+// Add feedback resource - standalone resources appear after grouped resources
+builder.AddFeedbackResource("workshop-feedback");
+
 builder.Build().Run();
+
